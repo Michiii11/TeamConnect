@@ -1,0 +1,239 @@
+/************ Variables ************/
+/************ General ************/
+@import url("https://fonts.googleapis.com/css2?family=Nunito:wght@300&display=swap");
+* {
+  margin: 0;
+  padding: 0;
+  font-family: "Nunito", sans-serif;
+}
+
+img {
+  width: 100%;
+  display: block;
+}
+
+body {
+  background-color: hsl(0, 0%, 100%);
+  color: hsl(0, 0%, 0%);
+  font-family: sans-serif;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+a {
+  background-color: hsl(0, 0%, 100%);
+  scroll-behavior: smooth;
+}
+
+button {
+  background-color: transparent;
+  border: none;
+  color: hsl(123, 43%, 39%);
+  cursor: pointer;
+  user-select: none;
+}
+
+/************ Main Style ************/
+main {
+  display: flex;
+  height: 93dvh;
+  position: relative;
+}
+
+hr {
+  border-color: hsl(0, 0%, 25%);
+  margin-block: 0.5rem;
+}
+
+/*---------- nav ----------*/
+nav {
+  height: 5vh;
+}
+
+nav.login {
+  position: absolute;
+  top: 0;
+  left: 0;
+  color: hsl(0, 0%, 0%);
+  background-color: transparent;
+  font-size: 1.5rem;
+  padding: 1rem;
+  z-index: 2;
+}
+
+/*---------- aside ----------*/
+main aside {
+  min-width: 10%;
+  background-color: hsl(0, 0%, 95%);
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  height: 95vh;
+}
+main aside h1, main aside p {
+  padding: 0.4rem 1rem;
+}
+main aside hr {
+  margin-block: 0.3rem;
+}
+
+main aside section.teams {
+  height: auto;
+}
+main aside section.teams h1 {
+  border-bottom: 1px solid hsl(0, 0%, 0%);
+}
+
+main aside section.buttons {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1vw;
+  padding: 1rem;
+}
+
+main aside section.buttons div {
+  display: flex;
+  justify-content: space-between;
+}
+
+/*---------- Login ----------*/
+main.login {
+  /*TODO this is offset i think*/
+  height: 100vh;
+  display: grid;
+  place-items: center;
+}
+main.login .backgroundImage {
+  position: absolute;
+  background-image: url("./img/background.png");
+  background-size: cover;
+  background-position: right;
+  background-repeat: no-repeat;
+  left: 0;
+  height: 100vh;
+  width: 75%;
+  z-index: 1;
+}
+
+#login-container {
+  background-color: hsl(0, 0%, 100%);
+  box-shadow: 0.1rem 0.1rem hsl(0, 0%, 80%);
+  text-align: center;
+  padding: 4rem 2rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  border-radius: 1rem;
+  width: 35vw;
+  box-sizing: border-box;
+  z-index: 2;
+}
+#login-container h2 {
+  font-size: 3rem;
+  font-family: "Kanit", sans-serif;
+  font-weight: 200;
+  text-align: center;
+  margin-bottom: 3rem;
+}
+#login-container input {
+  background-color: hsl(0, 0%, 100%);
+  outline: none;
+  border: 1px solid hsl(0, 0%, 80%);
+  font-size: 1.2rem;
+  padding: 0.7rem;
+  border-radius: 0.2rem;
+  color: hsl(0, 0%, 0%);
+  margin-bottom: 2rem;
+  transition: border 0.2s;
+  width: 75%;
+}
+#login-container input:focus {
+  outline: none;
+  border-color: hsl(123, 43%, 39%);
+}
+#login-container input:last-of-type {
+  margin-bottom: 0rem;
+}
+#login-container .error {
+  color: hsl(0, 52%, 60%);
+  margin-bottom: 2rem;
+  margin-top: 0.8rem;
+}
+#login-container .error .spacer {
+  color: gray;
+}
+#login-container .info {
+  font-size: 0.9rem;
+  margin-bottom: 0.5rem;
+  color: hsl(0, 0%, 20%);
+  text-transform: uppercase;
+}
+
+#login-container .buttons {
+  display: flex;
+  justify-content: space-around;
+}
+#login-container .buttons button {
+  color: hsl(123, 43%, 39%);
+  padding: 0.7rem 1.2rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  transition: color 0.3s, background-color 0.3s;
+}
+#login-container .buttons button.main {
+  background-color: hsl(123, 43%, 39%);
+  color: hsl(0, 0%, 100%);
+  border-radius: 0.5rem;
+}
+#login-container .buttons button.main:hover {
+  background-color: hsl(123, 43%, 27%);
+}
+#login-container .buttons button.second {
+  background-color: hsl(0, 0%, 100%);
+  border-style: solid;
+  border-color: hsl(123, 43%, 39%);
+  border-width: 0.1rem;
+  border-radius: 0.5rem;
+}
+#login-container .buttons button.second:hover {
+  color: hsl(123, 43%, 27%);
+  border-color: hsl(123, 43%, 27%);
+}
+
+#login-container section {
+  display: none;
+}
+#login-container section.active {
+  display: block;
+}
+
+/************ PopupEngine Config ************/
+.popupEngineModalContent {
+  background-color: hsl(0, 0%, 95%);
+  color: hsl(0, 0%, 0%);
+}
+
+/************ Imports ************/
+/************ Keyframes ************/
+/************ Responsive ************/
+@media screen and (max-width: 1150px) { /*tablet*/
+  #login-container {
+    width: 50vw;
+  }
+  #login-container input {
+    margin-bottom: 1rem;
+  }
+}
+@media screen and (max-width: 600px) { /*phone*/
+  #login-container {
+    width: 90vw;
+  }
+  main.login {
+    background-size: cover;
+  }
+}
+
+/*# sourceMappingURL=style.css.map */

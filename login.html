@@ -1,0 +1,45 @@
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>TeamConnect</title>
+
+    <link rel="stylesheet" href="./style.css">
+    <script src="./js/login.js" defer></script>
+</head>
+<body>
+<nav class="login">
+    <h1>TeamConnect</h1>
+</nav>
+<main class="login">
+    <div class="backgroundImage"></div>
+    <div id="login-container">
+        <section class="signin">
+            <h2>Anmelden</h2>
+            <input type="text" placeholder="E-Mail Adresse">
+            <input type="password" placeholder="Passwort">
+            <p class="error"></p>
+            <div class="buttons">
+                <button class="second" onclick="render('signup')">ACCOUNT ERSTELLEN</button>
+                <button class="main" onclick="confirm()">ANMELDEN</button>
+            </div>
+        </section>
+        <section class="signup">
+            <h2>Registrieren</h2>
+            <input type="text" placeholder="Vorname">
+            <input type="text" placeholder="Nachname">
+            <input type="text" placeholder="E-Mail Adresse">
+            <input type="password" placeholder="Passwort">
+            <input type="password" placeholder="Passwort Wiederholen">
+            <p class="error"></p>
+            <div class="buttons">
+                <button class="second" onclick="render('signin')">EINLOGGEN</button>
+                <button class="main" onclick="confirm()">REGISTRIEREN</button>
+            </div>
+        </section>
+    </div>
+</main>
+</body>
+</html>
