@@ -23,7 +23,7 @@ if ($type == "sign_in") {
         $users->checkCredentials(strtolower($_GET["email"]), $_GET["password"]))
     {
         $_SESSION["loggedIn"] = true;
-        $_SESSION["userEmail"] = strtolower($_GET["email"]);
+        $_SESSION["userID"] = $users->getID(strtolower($_GET["email"]));
         $response->loggedIn = true;
     }
     else{
@@ -40,7 +40,7 @@ else if ($type == "sign_up") {
 
             if($users->checkCredentials($mail,$postBody->password)){
                 $_SESSION["loggedIn"] = true;
-                $_SESSION["userEmail"] = $mail;
+                $_SESSION["userID"] = $users->getID($mail);
                 $response -> loggedIn = true;
             }
         }
@@ -52,15 +52,20 @@ else if ($type == "sign_up") {
 
 else if (isset($_SESSION["loggedIn"]) && $_SESSION["loggedIn"]) {
     $response->loggedIn = true;
-    $response->name = $users->getName($_SESSION["userEmail"]);
+    $response->name = $users->getName($_SESSION["userID"]);
 
-/*    if($type == "getAsideData"){
-        $response->data = array(
-            "animalTypes" => $users->getAnimaltypes(),
-            "owners" => $users->getOwners(),
-            "rooms" => $users->getRooms()
-        );
-    }*/
+    if($type == "getAsideData"){
+        $response->data = $users->getTeams($_SESSION["userID"]);
+    }
+
+    if($type == "getPlayer"){
+        $response->data = $users->getPlayer($_GET["teamID"]);
+    }
+
+    if($type == "getEvents"){
+        $response->userID = $_SESSION["userID"];
+        $response->data = $users->getEvents($_SESSION["userID"]);
+    }
 }
 else {
     $response->message = "Not Logged in!";

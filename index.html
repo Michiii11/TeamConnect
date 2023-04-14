@@ -13,45 +13,72 @@
 <body>
 <nav>
     <h1>TeamConnect</h1>
+    <h1 class="teamName">michis team</h1>
 </nav>
 <main>
     <aside>
         <section class="teams">
             <h1>Meine Teams</h1>
 
-            <p>michis team</p>
-            <p>yaniks team</p>
-            <p>leons team</p>
+            <div class="content"></div>
+            <div class="hoverBox"></div>
         </section>
 
         <section class="buttons">
-            <div>
-                <i class="fa-solid fa-bell"></i>
-                <p>Benachrichtigung</p>
-            </div>
-
-            <div>
-                <i class="fa-solid fa-message"></i>
-                <p>Persönliche Chats</p>
-            </div>
-            <div>
-                <i class="fa-solid fa-circle-user"></i>
-                <p>Benutzer</p>
-            </div>
+            <p><i class="fa-solid fa-bell"></i>Benachrichtigung</p>
+            <p><i class="fa-solid fa-message"></i>Persönliche Chats</p>
+            <p><i class="fa-solid fa-circle-user"></i>Benutzer</p>
         </section>
     </aside>
 
     <div class="board">
         <section class="chat">
+            <div class="chatBox">
+                <div class="messageBox">
+                    <i class="fa-solid fa-circle-user"></i>
+                    <div>
+                        <h3>Michael Leisch</h3>
+                        <p>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam</p>
+                    </div>
+                </div>
 
+                <div class="messageBox isMyMessage sameUser">
+                    <i class="fa-solid fa-circle-user"></i>
+                    <div>
+                        <h3>Michael Leisch</h3>
+                        <p>Lorem ipsum dolor sit amet, consetetur sadipscing elitr,</p>
+                    </div>
+                </div>
+
+                <div class="messageBox isMyMessage">
+                    <i class="fa-solid fa-circle-user"></i>
+                    <div>
+                        <h3>Michael Leisch</h3>
+                        <p>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.</p>
+                    </div>
+                </div>
+
+                <div class="messageBox">
+                    <i class="fa-solid fa-circle-user"></i>
+                    <div>
+                        <h3>Michael Leisch</h3>
+                        <p>Lorem ipsum dolor sit amet,</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="inputBox">
+                <input id="chatInputField" type="text" placeholder="Schreibe eine Nachricht">
+                <p>Senden</p>
+            </div>
         </section>
 
-        <section class="player">
-
-        </section>
+        <section class="player"></section>
 
         <section class="calendar">
+            <div class="eventList"></div>
 
+            <p class="newEventButton"><i class="fa-solid fa-plus"></i>NEUER EINTRAG</p>
         </section>
     </div>
 </main>

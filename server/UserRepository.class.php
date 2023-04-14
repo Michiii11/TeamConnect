@@ -61,64 +61,23 @@ class UserRepository
         }
     }
 
-    function getAnimaltypes(){
-        $sql = "select at.ID as type_id, at.name as type_name, ab.id as breed_id, ab.name as breed_name from animal_type at join animal_breed ab on at.ID = ab.animal_type_ID
-                where at.shelter_email = '{$_SESSION['userEmail']}'";
-        try {
-            $result = $this->connection->query($sql);
-
-            $rows = array();
-            while ($row = $result->fetch_assoc()) {
-                $rows[] = $row;
-            }
-
-            return $rows;
-        } catch (mysqli_sql_exception $err) {
-            echo "SQL error occurred: " . $err->getMessage();
-        }
-    }
-
-    function getOwners(){
-        $sql = "select ID, name, adress, tel, email, note from owner where shelter_email = '{$_SESSION['userEmail']}'";
-        try {
-            $result = $this->connection->query($sql);
-
-            $rows = array();
-            while ($row = $result->fetch_assoc()) {
-                $rows[$row["ID"]] = $row;
-            }
-
-            return $rows;
-        } catch (mysqli_sql_exception $err) {
-            echo "SQL error occurred: " . $err->getMessage();
-        }
-    }
-
-    function getRooms(){
-        $sql = "select ID, size, name from room where shelter_email = '{$_SESSION['userEmail']}'";
-        try {
-            $result = $this->connection->query($sql);
-
-            $rows = array();
-            while ($row = $result->fetch_assoc()) {
-                $rows[$row["ID"]] = $row;
-            }
-
-            return $rows;
-        } catch (mysqli_sql_exception $err) {
-            echo "SQL error occurred: " . $err->getMessage();
-        }
-    }
-
-    //getters & setters
-    function getConnection()
-    {
-        return $this->connection;
-    }
-
-    function getName($email)
-    {
+    function getID($email){
         $sql = "select * from user where email = '$email'";
+        try {
+            $result = $this->connection->query($sql);
+            if ($result->num_rows == 0) {
+                return false;
+            } else {
+                $row = $result->fetch_assoc();
+                return $row["id"];
+            }
+        } catch (mysqli_sql_exception $err) {
+            throw new Exception("SQL error occurred: " . $err->getMessage());
+        }
+    }
+
+    function getName($id){
+        $sql = "select * from user where id = '$id'";
         try {
             $result = $this->connection->query($sql);
             if ($result->num_rows == 0) {
@@ -130,5 +89,68 @@ class UserRepository
         } catch (mysqli_sql_exception $err) {
             echo "SQL error occurred: " . $err->getMessage();
         }
+    }
+
+    function getTeams($id){
+        $sql = "select id, name, t.playerID as 'captain', user_team.playerID from user_team 
+                join team t on user_team.teamID = t.id
+                where user_team.playerID like {$id};";
+        try {
+            $result = $this->connection->query($sql);
+
+            $rows = array();
+            while ($row = $result->fetch_assoc()) {
+                $rows[$row["id"]] = $row;
+            }
+
+            return $rows;
+        } catch (mysqli_sql_exception $err) {
+            echo "SQL error occurred: " . $err->getMessage();
+        }
+    }
+
+    function getPlayer($teamId){
+        $sql = "select u.id as 'id', firstname, lastname, email, position, health, rule, height, weight from team
+                join user_team ut on team.id = teamID
+                join user u on ut.playerID = u.id
+                where team.id = {$teamId};";
+        try {
+            $result = $this->connection->query($sql);
+
+            $rows = array();
+            while ($row = $result->fetch_assoc()) {
+                $rows[$row["id"]] = $row;
+            }
+            return $rows;
+
+        } catch (mysqli_sql_exception $err) {
+            echo "SQL error occurred: " . $err->getMessage();
+        }
+    }
+
+    function getEvents($id){
+        $sql = "select eventID as 'id', type, DATE_FORMAT(date, '%d.%m.%Y') as 'date', date_format(time, '%h:%m') as 'time' from user_event ue
+                join event e on ue.eventID = e.id
+                join user u on ue.playerID = u.id
+                where u.id = $id;";
+        try {
+            $result = $this->connection->query($sql);
+
+            $rows = array();
+            while ($row = $result->fetch_assoc()) {
+                $rows[$row["id"]] = $row;
+            }
+
+            return $rows;
+        } catch (mysqli_sql_exception $err) {
+            echo "SQL error occurred: " . $err->getMessage();
+        }
+    }
+
+
+    //getters & setters
+    function getConnection()
+    {
+        return $this->connection;
     }
 }

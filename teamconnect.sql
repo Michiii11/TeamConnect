@@ -155,3 +155,25 @@ COMMIT;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+
+
+insert into team (playerID, name) values (8, 'michis team');
+insert into team (playerID, name) values (9, 'yaniks team');
+
+insert into user_team (playerID, teamID) values (8, 1);
+insert into user_team (playerID, teamID) values (9, 1);
+insert into user_team (playerID, teamID) values (9, 2);
+
+insert into event (teamID, type, duration) values (1, 'Konditionstraining', 1);
+insert into event (teamID, type, duration) values (1, 'Fußballtraining', 1);
+insert into event (teamID, type, duration) values (1, 'Spiel gegen LASK Linz', 1);
+
+insert into user_event(eventID, playerID) values (1, 8);
+insert into user_event(eventID, playerID) values (2, 8);
+insert into user_event(eventID, playerID) values (3, 8);
+
+
+select eventID, type, DATE_FORMAT(date, '%d.%m.%Y') as 'date', date_format(time, '%h:%m') as 'time' from user_event ue
+join event e on ue.eventID = e.id
+join user u on ue.playerID = u.id
+where u.id = 8;

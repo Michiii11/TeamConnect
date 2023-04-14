@@ -1,224 +1,192 @@
-let shelterName = "will be aquired from the login"
-let animalColumns //number of columns currently displayed
-let asideData
+/********* variables *********/
+let userName
+let currentTeamName
+let currentTeamID
 
+function updateDashboard(){
+    getPlayers();
+    getEvents();
+}
+
+/********* check login *********/
+//region
 checkLogin()
-
-PopupEngine.init({backgroundColor: "hsl(0, 0%, 12%)", textColor: "hsl(0, 0%, 100%)", elemBackground: "hsl(0, 0%, 8%)"})
-
 function checkLogin(){
-    fetch(`./backend/user.php/`)
+    fetch(`./server/user.php/`)
         .then((response) => {
             return response.json()
         })
         .then(answer=>{
             if(answer.loggedIn !== true){
-                window.location.replace(document.location.href + "/login");
+                window.location.replace(document.location.href + "/login.html");
             }
             else{
-                document.querySelector("nav h1").innerText = answer.name
-                shelterName = answer.name
+                userName = answer.name
             }
         })
         .catch((error) => {
             console.error("Error:", error);
         });
 }
+//endregion
 
+
+/********* navigation hover effect *********/
+//region
+let hoverBox = document.querySelector(".hoverBox");
+function highlightNavitem(elem){
+    hoverBox.style.opacity= 0.3;
+    let rect = elem.getBoundingClientRect();
+    hoverBox.style.top = rect.top-document.querySelector("nav").clientHeight+rect.height/2+"px";
+}
+function unhighlightNavitem(){
+    hoverBox.style.opacity = 0;
+}
+function addNavitemEventListener(){
+    document.querySelectorAll("aside .content p").forEach((item)=>{
+        item.onmouseenter = () => {highlightNavitem(item)};
+        item.onmouseleave = () => {unhighlightNavitem()};
+    })
+}
+//endregion
+
+
+/********* asside *********/
+//region
 getAsideData()
 function getAsideData(){
-    fetch(`./backend/user.php/getAsideData`)
+    fetch(`./server/user.php/getAsideData`)
         .then((response) => {
             return response.json()
         })
         .then(answer=>{
-            console.log(answer.data)
-            lookups = answer.data
-
             renderAside(answer.data)
-            getAnimals()
         })
         .catch((error) => {
             console.error("Error:", error);
         });
 }
+function renderAside(data){
+    let html = "";
 
-function getAnimals(){
-    fetch(`./backend/animal.php/getAllAnimals`)
+    let i = 0;
+    Object.values(data).forEach(item => {
+        if(i++ === 0){
+            html += `<p class="active" onclick="selectTeam(this, ${item.id})">${item.name}`;
+            currentTeamID = item.id
+        } else{
+            html += `<p onclick="selectTeam(this, ${item.id})">${item.name}`;
+        }
+
+        if (item.captain === item.playerID) {
+            html += `<i class="fa-solid fa-crown"></i>`;
+        }
+
+        html += `</p>`;
+    });
+
+    document.querySelector("main aside section .content").innerHTML = html
+
+    addNavitemEventListener();
+    unhighlightNavitem();
+    updateDashboard()
+}
+
+function selectTeam(elem, id){
+    if(document.querySelector(".active")){
+        document.querySelector(".active").classList.remove("active");
+    }
+    elem.classList.add("active");
+
+    currentTeamID = id;
+    currentTeamName = elem.textContent;
+    updateDashboard()
+    document.querySelector("nav .teamName").innerHTML = currentTeamName;
+}
+//endregion
+
+
+/********* player box *********/
+//region
+function getPlayers(){
+    fetch(`./server/user.php/getPlayer?teamID=${currentTeamID}`)
         .then((response) => {
             return response.json()
         })
         .then(answer=>{
-            console.log(answer.data)
-
-            document.querySelectorAll(".animals .content .column").forEach((elem) => {
-                elem.innerHTML = ""
-            })
-
-            answer.data.forEach((animal)=>{
-                renderAnimal(animal);
-            })
+            renderPlayers(answer.data)
         })
         .catch((error) => {
             console.error("Error:", error);
         });
 }
 
-function editAnimal(){
-    PopupEngine.createModal({
-        text: "Michael",
-        buttons: [{text: "close"}]
-    })
-}
+function renderPlayers(data){
+    let html = "";
 
-changeColumnSize(3)
-function changeColumnSize(to){
-    if(animalColumns === to) return
-
-    document.querySelector(".animals .content").innerHTML = ""
-    animalColumns = to
-    for (let i = 0; i < to; i++) {
-        let col = document.createElement("div")
-        col.classList.add("column")
-        document.querySelector(".animals .content").appendChild(col)
-    }
-}
-
-window.addEventListener("resize", (event) => {
-    if(window.innerWidth < 600){
-        changeColumnSize(1)
-    }
-    else if(window.innerWidth < 1150){
-        changeColumnSize(2)
-    }
-    else{
-        changeColumnSize(3)
-    }
-});
-
-function addAnimal(){
-    const data = {name: "animal", typeID: 1, gender: 0, roomID: 1};
-    console.log(data)
-    fetch("./backend/animal.php/addAnimal", {
-        method: "POST", // or 'PUT'
-        headers: {
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-    })
-        .then((response) => {
-            return response.text()
-        })
-        .then((data) => {
-            console.log(data)
-
-            getAnimals()
-        })
-        .catch((error) => {
-            console.error("Error:", error);
-        });
-}
-
-/**
- * Adds a animal into the html
- * @param data optional json object that contains all the date of the animal you want to add
- */
-function renderAnimal(data){
-    console.log(data)
-
-    let birthdateObject = new Date(data.birthdate)
-
-    let processedData = {
-        gender: data.gender === 0 ? "male" : "female",
-        age: data.birthdate ? Math.abs(new Date(Date.now() - birthdateObject.getTime()).getUTCFullYear() - 1970) : "unkown",
-        note: data.note || "",
-        owner: data.owner_name || shelterName
-    }
-
-    let feedTimeString = ""
-    /*data.feedTimes.forEach((item)=>{
-        feedTimeString += item
-        if(item !== data.feedTimes.at(-1)){
-            feedTimeString += " • "
-        }
-    })*/
-
-    let animal =
-        `<section class="animal">
-            <div class="top">
-                <div class="left">
-                    <h2>${data.name}</h2>
-                    <p class="subtext"><span class="link">${data.type_name}</span> • ${data.breed_name || "unknown"} • ${processedData.gender}</p>
-                    <hr class="accent">
+    Object.values(data).forEach(item => {
+        html += `
+            <div class="playerBox">
+                <i class="fa-solid fa-circle-user"></i>
+                <div class="playerStats">
+                    <h2>${item.firstname} ${item.lastname}</h2>
+                    <p>RM - GESUND - STAMMSPIELER</p>
                 </div>
-                <div class="imgbox" style="background-image: ${data.image}"></div>
+                <i class="fa-sharp fa-solid fa-pen"></i>
             </div>
-            <div class="bottom">
-                <p class="birthdate">
-                <span class="label">birthdate</span>${data.birthdate}
-                <span class="label"> • age</span>${processedData.age}</p>
-                <p class="room"><span class="label">ROOM</span><span class="link">${data.room_name}</span></p>
-                <br>
-                <p class="food">
-                    <span class="label">menu</span>${data.menu}
-                    <br><span class="label">feedtimes</span>${feedTimeString}
-                </p>
-                <br>
-                <p class="owner">
-                    <span class="label">OWNER</span><span class="link">${data.owner_name}</span>
-                    <span class="label"> • Since</span>${data.acquiryDate}
-                </p>
-                <hr>
-                <p class="note" contenteditable="true" spellcheck="false">${processedData.note}</p>
+        `
+    });
+
+    document.querySelector(".board section.player").innerHTML = html
+}
+//endregion
+
+
+/********* calenar box *********/
+//region
+function getEvents(){
+    fetch(`./server/user.php/getEvents`)
+        .then((response) => {
+            return response.json()
+        })
+        .then(answer=>{
+            renderEventList(answer.data)
+        })
+        .catch((error) => {
+            console.error("Error:", error);
+        });
+}
+
+function renderEventList(data){
+    let html = "";
+
+    console.log(data)
+
+    Object.values(data).forEach(item => {
+        html += `
+            <div class="eventBox">
+                <i class="fa-solid fa-trophy"></i>
+                <div>
+                    <h4>${item.type}</h4>
+                    <p>${getDayByDate(item.date)}, ${item.date} - ${item.time} Uhr</p>
+                </div>
             </div>
-        </section>`
+        `
+    });
 
-
-    let column = document.querySelector(".animals .content .column")
-    document.querySelectorAll(".animals .content .column").forEach((elem) => {
-        if (elem.clientHeight < column.clientHeight)
-            column = elem
-    })
-    column.innerHTML += animal
+    document.querySelector(".board section.calendar .eventList").innerHTML = html
 }
+function getDayByDate(dateStr){
+    dateStr = '15.04.2023';
+    let parts = dateStr.split('.');
+    let day = parseInt(parts[0], 10);
+    let month = parseInt(parts[1], 10) - 1;
+    let year = parseInt(parts[2], 10);
 
-function renderAside(data){
-    let html = generateSimpelAside("owners", data.owners)
-    html += generateSimpelAside("rooms", data.rooms)
+    let date = new Date(year, month, day);
 
-    let typeHtml = document.createElement("ul")
-    typeHtml.classList.add("types")
-    let lastType = -1
-    let listItem
-    let listObject
-    data.animalTypes.forEach(item => {
-        if(item.type_id !== lastType){
-            if(listItem)typeHtml.appendChild(listItem)
-
-            lastType = item.type_id
-            listItem = document.createElement("li")
-            listItem.onclick = ()=>{loadAnimals("types", item.type_id)}
-            listItem.innerHTML = `<span>${item.type_name}</span>`
-            listObject = document.createElement("ul")
-            listItem.appendChild(listObject)
-        }
-        listObject.innerHTML += `<li>${item.breed_name}</li>`
-    })
-    typeHtml.appendChild(listItem)
-
-    document.querySelector("main aside .content").innerHTML = html
-    document.querySelector("main aside .content").appendChild(typeHtml)
+    let daysOfWeek = ['Sonntag', 'Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag'];
+    let dayOfWeek = daysOfWeek[date.getDay()];
+    return dayOfWeek;
 }
-
-function generateSimpelAside(name, data){
-    let items = ""
-    data.forEach(item => {
-        items += `<li onClick="loadAnimals(${name}, ${item.ID})">${item.name}</li>`
-    })
-
-    return `<ul class="${name}">${items}</ul>`
-}
-
-function loadAnimals(sort, ID, breed){
-
-}
+//endregion
