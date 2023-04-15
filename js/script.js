@@ -190,3 +190,11 @@ function getDayByDate(dateStr){
     return dayOfWeek;
 }
 //endregion
+
+
+/********* calenar box *********/
+//region
+function openSidebar(type){
+
+}
+//endregion

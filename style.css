@@ -57,12 +57,12 @@ nav.login {
 
 /*---------- aside ----------*/
 main aside {
-  z-index: 2;
-  min-width: 10%;
-  background-color: hsl(0, 0%, 10%);
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
+  z-index: 2;
+  width: 200px;
+  background-color: hsl(0, 0%, 10%);
   height: 95vh;
 }
 main aside h1, main aside p {
@@ -72,10 +72,14 @@ main aside h1, main aside p {
 main aside section.teams {
   position: relative;
 }
-main aside section.teams h1 {
+main aside section.teams h1, main aside section.teams > i {
   padding-block: 0.5rem;
   border-bottom: 1px solid hsl(0, 0%, 100%);
   margin-bottom: 0.5rem;
+}
+main aside section.teams > i {
+  text-align: center;
+  display: none;
 }
 main aside section.teams div.hoverBox {
   z-index: -1;
@@ -104,21 +108,24 @@ main aside section.teams p i {
 }
 
 main aside section.buttons {
-  border-top: 1px solid hsl(0, 0%, 100%);
-  margin-top: auto;
   display: flex;
   flex-direction: column;
+  border-top: 1px solid hsl(0, 0%, 100%);
+  margin-top: auto;
   gap: 0.2rem;
 }
-main aside section.buttons p {
+main aside section.buttons div {
+  display: flex;
+  align-items: center;
   padding-block: 0.75rem;
+  padding-left: 0.5rem;
   cursor: pointer;
   transition: all 0.2s;
 }
-main aside section.buttons p:hover {
+main aside section.buttons div:hover {
   color: #bfbfbf;
 }
-main aside section.buttons p i {
+main aside section.buttons div i {
   padding-right: 0.5rem;
 }
 
@@ -240,7 +247,6 @@ main.login .backgroundImage {
   width: 100%;
   margin-top: 2.5vh;
 }
-
 .board section {
   background-color: hsl(0, 0%, 15%);
   width: 30%;
@@ -398,28 +404,53 @@ main.login .backgroundImage {
 /************ Imports ************/
 /************ Keyframes ************/
 /************ Responsive ************/
-@media screen and (max-width: 1150px) { /*tablet*/
+@media screen and (max-width: 1150px) { /*laptop*/
   #login-container {
     width: 50vw;
   }
   #login-container input {
     margin-bottom: 1rem;
   }
+  main aside {
+    width: 50px;
+  }
+  main aside section.teams h1 {
+    display: none;
+  }
+  main aside section.teams > i {
+    display: blocK;
+  }
+  main aside section.buttons {
+    align-items: center;
+  }
+  main aside section.buttons p {
+    display: none;
+  }
+}
+@media screen and (max-width: 900px) { /*tablet*/
   .board {
     display: flex;
-    flex-direction: column;
-    align-items: center;
-    width: 100%;
-    margin-top: 2.5vh;
   }
   .board section {
-    width: 90%;
-    height: 30%;
+    width: 60%;
+    height: 100%;
+    border-radius: 1rem;
+    box-shadow: 0.1rem 0.1rem 0.1rem hsl(0, 0%, 25%);
+    overflow: hidden;
+  }
+  .board section.player, .board section.calendar {
+    display: none;
+  }
+  .board section.chat .chatBox {
+    height: 77vh;
   }
 }
 @media screen and (max-width: 600px) { /*phone*/
   #login-container {
     width: 90vw;
+  }
+  .board section {
+    width: 90%;
   }
   main.login {
     background-size: cover;

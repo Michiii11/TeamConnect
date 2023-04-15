@@ -79,16 +79,15 @@ nav.login{
 //endregion
 
 /*---------- aside ----------*/
-
 //region
 
 main aside{
-  z-index: 2;
-  min-width: 10%;
-  background-color: $gray-200;
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
+  z-index: 2;
+  width: 200px;
+  background-color: $gray-200;
   height: 95vh;
 
   h1, p{
@@ -99,10 +98,14 @@ main aside{
 main aside section.teams{
   position: relative;
 
-  h1{
+  h1,&>i{
     padding-block: .5rem;
     border-bottom: 1px solid $color-contrast;
     margin-bottom: .5rem;
+  }
+  &>i {
+    text-align: center;
+    display: none;
   }
 
   div.hoverBox{
@@ -135,19 +138,25 @@ main aside section.teams{
 }
 
 main aside section.buttons{
-  border-top: 1px solid $color-contrast;
-  margin-top: auto;
   display: flex;
   flex-direction: column;
+  border-top: 1px solid $color-contrast;
+  margin-top: auto;
   gap: .2rem;
 
-  p{
+  div{
+    display: flex;
+    align-items: center;
     padding-block: .75rem;
+    padding-left: .5rem;
     cursor: pointer;
     transition: all .2s;
 
     &:hover{
       color: adjust-color($color-contrast, $lightness: -25%);
+    }
+    p{
+
     }
     i{
       padding-right: .5rem;
@@ -159,7 +168,6 @@ main aside section.buttons{
 //endregion
 
 /*---------- Login ----------*/
-
 //region
 
 main.login{
@@ -305,15 +313,15 @@ main.login{
   justify-content: space-evenly;
   width: 100%;
   margin-top: 2.5vh;
-}
 
-.board section{
-  background-color: $gray-300;
-  width: 30%;
-  height: 90vh;
-  border-radius: 1rem;
-  box-shadow: .1rem .1rem .1rem $gray-500;
-  overflow: hidden;
+  section{
+    background-color: $gray-300;
+    width: 30%;
+    height: 90vh;
+    border-radius: 1rem;
+    box-shadow: .1rem .1rem .1rem $gray-500;
+    overflow: hidden;
+  }
 }
 
 /*---------- ChatBox ----------*/
@@ -489,7 +497,7 @@ main.login{
 /************ Responsive ************/
 
 //region
-@media screen and (max-width: 1150px) { /*tablet*/
+@media screen and (max-width: 1150px) { /*laptop*/
   #login-container {
     width: 50vw;
 
@@ -498,22 +506,56 @@ main.login{
     }
   }
 
+  main aside{
+    width: 50px;
+
+    section.teams{
+      h1{
+        display:none;
+      }
+      &> i{
+        display:blocK;
+      }
+    }
+
+    section.buttons{
+      align-items: center;
+
+      p{
+        display: none;
+      }
+    }
+  }
+}
+
+@media screen and (max-width: 900px){ /*tablet*/
   .board {
     display: flex;
-    flex-direction: column;
-    align-items: center;
-    width: 100%;
-    margin-top: 2.5vh;
-  }
-  .board section {
-    width: 90%;
-    height: 30%;
+
+    section{
+      width: 60%;
+      height: 100%;
+      border-radius: 1rem;
+      box-shadow: .1rem .1rem .1rem $gray-500;
+      overflow: hidden;
+    }
+    section.player, section.calendar{
+      display: none;
+    }
+
+    section.chat .chatBox {
+      height: 77vh;
+    }
   }
 }
 
 @media screen and (max-width: 600px) { /*phone*/
   #login-container{
     width: 90vw;
+  }
+
+  .board section{
+    width: 90%;
   }
 
   main.login{
