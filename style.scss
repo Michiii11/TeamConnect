@@ -9,6 +9,7 @@ $color-contrast: hsl(0, 0%, 100%);
 $gray-100: hsl(0, 0%, 5%);
 $gray-200: hsl(0, 0%, 10%);
 $gray-300: hsl(0, 0%, 15%);
+$gray-350: hsl(0, 0%, 18%);
 $gray-400: hsl(0, 0%, 20%);
 $gray-500: hsl(0, 0%, 25%);
 $gray-600: hsl(0, 0%, 30%);
@@ -17,7 +18,7 @@ $gray-text-hover: hsl(0, 0%, 80%);
 
 /************ General ************/
 
-//region
+//region general
 
 *{
   margin: 0;
@@ -44,11 +45,31 @@ main{
   height: 90vh;
   position: relative;
 }
+
+p.newButton{
+  color: $primary-main;
+  border: 3px solid $primary-main;
+  font-weight: bold;
+  border-radius: 1rem;
+  cursor: pointer;
+  text-align: center;
+  padding-block: 1rem;
+  margin: auto 2rem 2rem;
+  transition: all .2s;
+
+  &:hover{
+    color: $primary-light;
+    border-color: $primary-light;
+  }
+  i{
+    margin-right: 1rem;
+  }
+}
 //endregion
 
 /*---------- nav ----------*/
 
-//region
+//region nav
 
 nav{
   display: flex;
@@ -79,7 +100,7 @@ nav.login{
 //endregion
 
 /*---------- aside ----------*/
-//region
+//region aside
 
 main aside{
   display: flex;
@@ -168,7 +189,7 @@ main aside section.buttons{
 //endregion
 
 /*---------- Login ----------*/
-//region
+//region login
 
 main.login{
   /*TODO this is offset i think*/
@@ -307,7 +328,7 @@ main.login{
 //endregion
 
 /*---------- Board ----------*/
-//region
+//region board
 .board{
   display: flex;
   justify-content: space-evenly;
@@ -345,6 +366,7 @@ main.login{
 
   border: 1px solid $gray-500;
   color: $color-contrast;
+  background-color: $gray-350;
 
   i{
     font-size: 1.5rem;
@@ -404,6 +426,7 @@ main.login{
 }
 //endregion
 
+
 /*---------- PlayerBox ----------*/
 //region
 .board section.player {
@@ -442,24 +465,6 @@ main.login{
 .board section.calendar {
   display: flex;
   flex-direction: column;
-  p.newEventButton{
-    color: $primary-main;
-    border: 1px solid $primary-main;
-    border-radius: 1rem;
-    cursor: pointer;
-    text-align: center;
-    padding-block: 1rem;
-    margin: 2rem;
-    transition: all .2s;
-
-    &:hover{
-      color: $primary-light;
-      border-color: $primary-light;
-    }
-    i{
-      margin-right: 1rem;
-    }
-  }
 }
 
 .board section.calendar .eventList{
@@ -496,7 +501,7 @@ main.login{
 
 /************ Responsive ************/
 
-//region
+//region responsive
 @media screen and (max-width: 1150px) { /*laptop*/
   #login-container {
     width: 50vw;

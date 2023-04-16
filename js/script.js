@@ -21,7 +21,8 @@ function checkLogin(){
                 window.location.replace(document.location.href + "/login.html");
             }
             else{
-                userName = answer.name
+                userName = answer.name;
+                document.querySelector(".userName").innerHTML = userName;
             }
         })
         .catch((error) => {
@@ -85,6 +86,8 @@ function renderAside(data){
         html += `</p>`;
     });
 
+    html += `<p onclick="addTeam()" class="addButton">Team hinzufügen</p>`
+
     document.querySelector("main aside section .content").innerHTML = html
 
     addNavitemEventListener();
@@ -102,6 +105,10 @@ function selectTeam(elem, id){
     currentTeamName = elem.textContent;
     updateDashboard()
     document.querySelector("nav .teamName").innerHTML = currentTeamName;
+}
+
+function addTeam(){
+
 }
 //endregion
 
@@ -137,6 +144,7 @@ function renderPlayers(data){
         `
     });
 
+    html += `<p class="newButton"><i class="fa-solid fa-plus"></i>NEUER SPIELER</p>`
     document.querySelector(".board section.player").innerHTML = html
 }
 //endregion

@@ -27,6 +27,25 @@ main {
   position: relative;
 }
 
+p.newButton {
+  color: hsl(123, 43%, 39%);
+  border: 3px solid hsl(123, 43%, 39%);
+  font-weight: bold;
+  border-radius: 1rem;
+  cursor: pointer;
+  text-align: center;
+  padding-block: 1rem;
+  margin: auto 2rem 2rem;
+  transition: all 0.2s;
+}
+p.newButton:hover {
+  color: hsl(123, 27%, 51%);
+  border-color: hsl(123, 27%, 51%);
+}
+p.newButton i {
+  margin-right: 1rem;
+}
+
 /*---------- nav ----------*/
 nav {
   display: flex;
@@ -276,6 +295,7 @@ main.login .backgroundImage {
   margin: 0.3rem;
   border: 1px solid hsl(0, 0%, 25%);
   color: hsl(0, 0%, 100%);
+  background-color: hsl(0, 0%, 18%);
 }
 .board section.chat .messageBox i {
   font-size: 1.5rem;
@@ -361,23 +381,6 @@ main.login .backgroundImage {
 .board section.calendar {
   display: flex;
   flex-direction: column;
-}
-.board section.calendar p.newEventButton {
-  color: hsl(123, 43%, 39%);
-  border: 1px solid hsl(123, 43%, 39%);
-  border-radius: 1rem;
-  cursor: pointer;
-  text-align: center;
-  padding-block: 1rem;
-  margin: 2rem;
-  transition: all 0.2s;
-}
-.board section.calendar p.newEventButton:hover {
-  color: hsl(123, 27%, 51%);
-  border-color: hsl(123, 27%, 51%);
-}
-.board section.calendar p.newEventButton i {
-  margin-right: 1rem;
 }
 
 .board section.calendar .eventList {

@@ -84,7 +84,7 @@ class UserRepository
                 return null;
             } else {
                 $row = $result->fetch_assoc();
-                return $row["lastname"];
+                return $row["firstname"] . " " . $row["lastname"];
             }
         } catch (mysqli_sql_exception $err) {
             echo "SQL error occurred: " . $err->getMessage();
