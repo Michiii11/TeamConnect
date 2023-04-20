@@ -27,6 +27,11 @@ main {
   position: relative;
 }
 
+input {
+  outline: none;
+  border: 1px solid hsl(0, 0%, 20%);
+}
+
 p.newButton {
   color: hsl(123, 43%, 39%);
   border: 3px solid hsl(123, 43%, 39%);
@@ -52,6 +57,7 @@ nav {
   align-items: center;
   text-align: center;
   height: 5vh;
+  box-sizing: border-box;
   background-color: hsl(0, 0%, 15%);
   box-shadow: 0 0.2rem hsl(0, 0%, 10%);
   z-index: 3;
@@ -75,7 +81,7 @@ nav.login {
 }
 
 /*---------- aside ----------*/
-main aside {
+main aside.sidebar {
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
@@ -84,23 +90,23 @@ main aside {
   background-color: hsl(0, 0%, 10%);
   height: 95vh;
 }
-main aside h1, main aside p {
+main aside.sidebar h1, main aside.sidebar p {
   padding: 0.4rem 0.5rem;
 }
 
-main aside section.teams {
+main aside.sidebar section.teams {
   position: relative;
 }
-main aside section.teams h1, main aside section.teams > i {
+main aside.sidebar section.teams h1, main aside.sidebar section.teams > i {
   padding-block: 0.5rem;
   border-bottom: 1px solid hsl(0, 0%, 100%);
   margin-bottom: 0.5rem;
 }
-main aside section.teams > i {
+main aside.sidebar section.teams > i {
   text-align: center;
   display: none;
 }
-main aside section.teams div.hoverBox {
+main aside.sidebar section.teams div.hoverBox {
   z-index: -1;
   position: absolute;
   background-color: #71ad74;
@@ -111,29 +117,64 @@ main aside section.teams div.hoverBox {
   transform: translateY(-50%);
   transition: all 0.2s;
 }
-main aside section.teams p {
+main aside.sidebar section.teams p {
   align-items: center;
   cursor: pointer;
   padding-left: 0.5rem;
   margin-right: 0.5rem;
 }
-main aside section.teams p.active {
+main aside.sidebar section.teams p.active {
   font-weight: bold;
   border-left: 2px solid hsl(123, 43%, 39%);
   color: hsl(123, 43%, 39%);
 }
-main aside section.teams p i {
+main aside.sidebar section.teams p i {
   padding-left: 0.5rem;
 }
+main aside.sidebar section.teams div.addButton {
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+  margin-top: 1rem;
+  border-top-right-radius: 1rem;
+  border-bottom-right-radius: 1rem;
+  margin-right: 0.5rem;
+  padding-block: 0.2rem;
+  border: 1px solid gray;
+  border-left: none;
+  cursor: pointer;
+  transition: 0.2s all;
+}
+main aside.sidebar section.teams div.addButton input {
+  background: none;
+  color: hsl(0, 0%, 100%);
+  width: 60%;
+  border: 0.1rem solid hsl(0, 0%, 30%);
+  border-radius: 0.5rem;
+  padding: 0.2rem;
+}
+main aside.sidebar section.teams div.addButton input:focus {
+  outline: none;
+  border-color: white;
+}
+main aside.sidebar section.teams div.addButton i.fa-check:hover, main aside.sidebar section.teams div.addButton i.fa-trash:hover {
+  color: #b3b3b3;
+}
+main aside.sidebar section.teams div.addButton span {
+  padding: 0.2rem 0.2rem;
+}
+main aside.sidebar section.teams div.addButton:not(.setName):hover {
+  background-color: rgba(200, 200, 200, 0.5);
+}
 
-main aside section.buttons {
+main aside.sidebar section.buttons {
   display: flex;
   flex-direction: column;
   border-top: 1px solid hsl(0, 0%, 100%);
   margin-top: auto;
   gap: 0.2rem;
 }
-main aside section.buttons div {
+main aside.sidebar section.buttons div {
   display: flex;
   align-items: center;
   padding-block: 0.75rem;
@@ -141,10 +182,10 @@ main aside section.buttons div {
   cursor: pointer;
   transition: all 0.2s;
 }
-main aside section.buttons div:hover {
+main aside.sidebar section.buttons div:hover {
   color: #bfbfbf;
 }
-main aside section.buttons div i {
+main aside.sidebar section.buttons div i {
   padding-right: 0.5rem;
 }
 
@@ -261,10 +302,13 @@ main.login .backgroundImage {
 
 /*---------- Board ----------*/
 .board {
+  box-sizing: border-box;
   display: flex;
+  position: relative;
   justify-content: space-evenly;
   width: 100%;
-  margin-top: 2.5vh;
+  padding-top: 2.5vh;
+  height: 95vh;
 }
 .board section {
   background-color: hsl(0, 0%, 15%);
@@ -402,6 +446,107 @@ main.login .backgroundImage {
 }
 .board section.calendar .eventList .eventBox i {
   padding-inline: 1rem;
+}
+
+/*---------- PopUp ----------*/
+.popUp {
+  display: none;
+}
+
+.popUp.active {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  background-color: hsla(0, 0%, 0%, 0.3);
+  backdrop-filter: blur(5px);
+  z-index: 10000;
+}
+.popUp.active i {
+  margin-block: 1rem;
+  font-size: 2rem;
+  padding: 1rem;
+  border-radius: 50%;
+  border: 1px solid hsl(0, 0%, 100%);
+}
+
+.popUp.active .content > div {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  text-align: center;
+  background-color: hsl(0, 0%, 15%);
+  border-radius: 1rem;
+  padding: 3rem;
+  width: 30vw;
+  height: 30vh;
+}
+.popUp.active .content > div.active {
+  display: flex;
+}
+.popUp.active .content > div .teamList {
+  margin-block: 1rem;
+  width: 15vw;
+  border-radius: 1rem;
+  padding: 1rem;
+}
+.popUp.active .content > div .teamList div {
+  height: 8vh;
+  border-bottom: 1px solid hsl(0, 0%, 100%);
+  overflow: auto;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.popUp.active .content > div .teamList div::-webkit-scrollbar {
+  display: none;
+}
+.popUp.active .content > div input {
+  margin-bottom: 1rem;
+  padding: 0.5rem;
+  border: 2px solid hsl(0, 0%, 100%);
+  color: hsl(0, 0%, 100%);
+  background: none;
+  border-radius: 0.5rem;
+  width: 15vw;
+}
+.popUp.active .content > div input:focus {
+  border: 2px solid #b3b3b3;
+}
+.popUp.active .content > div a {
+  color: hsl(0, 0%, 100%);
+  text-decoration: none;
+  cursor: pointer;
+  transition: 0.2s all;
+}
+.popUp.active .content > div a:hover {
+  text-decoration: underline;
+}
+.popUp.active .content > div .buttons {
+  margin-top: 2rem;
+  display: flex;
+  width: 50%;
+  justify-content: space-between;
+}
+.popUp.active .content > div .buttons p {
+  width: 5vw;
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  border: 1px solid hsl(0, 0%, 100%);
+  cursor: pointer;
+  transition: 0.2s all;
+}
+.popUp.active .content > div .buttons p:hover {
+  background-color: hsl(0, 0%, 100%);
+  color: hsl(0, 0%, 15%);
+}
+.popUp.active .content > div .buttons p:last-child:hover {
+  background-color: hsl(123, 43%, 39%);
+  color: hsl(0, 0%, 100%);
+}
+.popUp.active .content > div .buttons p:last-child {
+  border-color: hsl(123, 43%, 39%);
+  color: hsl(123, 43%, 39%);
 }
 
 /************ Imports ************/

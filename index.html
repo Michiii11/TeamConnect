@@ -6,17 +6,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="./style.css">
     <script src='js/script.js' defer></script>
+    <script src="js/popupEngine.js"></script>
     <script src="https://kit.fontawesome.com/557f0c19d3.js" crossorigin="anonymous"></script>
 </head>
-<?php
-    ?>
 <body>
+
 <nav>
     <h1>TeamConnect</h1>
     <h1 class="teamName">michis team</h1>
 </nav>
 <main>
-    <aside>
+    <aside class="sidebar">
         <section class="teams">
             <h1>Meine Teams</h1>
             <i class="fa-sharp fa-solid fa-people-group"></i>
@@ -32,6 +32,37 @@
     </aside>
 
     <div class="board">
+        <div class="popUp">
+            <div class="content">
+                <div class="add active">
+                    <h2>Team beitreten</h2>
+                    <div class="teamList">
+                        <input id="findTeamInput" type="text" autofocus placeholder="Teamname">
+                        <div>
+
+                        </div>
+                    </div>
+
+                    <a onclick="toggleTeamCreate()">Eigenes Team erstellen</a>
+                    <div class="buttons">
+                        <p onclick="togglePopUp()">Abbrechen</p>
+                        <p onclick="addTeam()">Beitreten</p>
+                    </div>
+                </div>
+
+                <div class="create">
+                    <h2>Team erstellen</h2>
+                    <i class="fa-solid fa-camera"></i>
+                    <input id="createTeamInput" type="text" autofocus placeholder="Teamname">
+
+                    <a onclick="toggleTeamCreate()">Bestehendes Team beitreten</a>
+                    <div class="buttons">
+                        <p onclick="togglePopUp()">Abbrechen</p>
+                        <p onclick="createTeam()">Erstellen</p>
+                    </div>
+                </div>
+            </div>
+        </div>
         <section class="chat">
             <div class="chatBox">
                 <div class="messageBox">

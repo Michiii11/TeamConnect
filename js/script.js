@@ -56,7 +56,7 @@ function addNavitemEventListener(){
 //region
 getAsideData()
 function getAsideData(){
-    fetch(`./server/user.php/getAsideData`)
+    fetch(`./server/team.php/getTeams`)
         .then((response) => {
             return response.json()
         })
@@ -68,7 +68,7 @@ function getAsideData(){
         });
 }
 function renderAside(data){
-    let html = "";
+    let html = "<div>";
 
     let i = 0;
     Object.values(data).forEach(item => {
@@ -86,7 +86,8 @@ function renderAside(data){
         html += `</p>`;
     });
 
-    html += `<p onclick="addTeam()" class="addButton">Team hinzufügen</p>`
+    html += `</div>`
+    html += `<div onclick="togglePopUp()" class="addButton"><span>Team Hinzufügen</span><i class="fa-solid fa-plus"></div>`
 
     document.querySelector("main aside section .content").innerHTML = html
 
@@ -107,8 +108,82 @@ function selectTeam(elem, id){
     document.querySelector("nav .teamName").innerHTML = currentTeamName;
 }
 
-function addTeam(){
+function togglePopUp(){
+    if(document.querySelector(".popUp.active")){
+        document.querySelector(".popUp.active").classList.remove("active");
+    } else{
+        document.querySelector(".popUp").classList.add("active");
+        loadTeamList()
+    }
+}
+function toggleTeamCreate(){
+    let activeDiv = document.querySelector(".popUp .add.active") ? "create" : "add"
 
+    document.querySelector(".popUp .active").classList.remove("active");
+    document.querySelector(`.popUp .${activeDiv}`).classList.add("active")
+}
+
+function loadTeamList(){
+    fetch(`./server/team.php/getAllTeams`)
+        .then((response) => {
+            return response.json()
+        })
+        .then(answer=>{
+            console.log(answer.data)
+            Object.values(answer.data).forEach(item => {
+                document.querySelector(".teamList div").innerHTML += `<p>${item.name}</p>`
+            })
+
+            })
+        .catch((error) => {
+            console.error("Error:", error);
+        });
+}
+function addTeam() {
+    const data = {teamName: teamName};
+    fetch("./server/team.php/addTeam", {
+        method: "POST", // or 'PUT'
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+    })
+        .then((response) => {
+            return response.text()
+        })
+        .then((data) => {
+            console.log(data)
+
+            getAsideData()
+        })
+        .catch((error) => {
+            console.error(`Error:`, error);
+        });
+}
+
+function createTeam() {
+    //todo fehlermeldung bei duplikaten
+    let name = document.querySelector("#createTeamInput").value;
+    const data = {teamName: name};
+    fetch("./server/team.php/createTeam", {
+        method: "POST", // or 'PUT'
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+    })
+        .then((response) => {
+            return response.text()
+        })
+        .then((data) => {
+            console.log(data)
+
+            getAsideData()
+            togglePopUp();
+        })
+        .catch((error) => {
+            console.error(`Error:`, error);
+        });
 }
 //endregion
 
@@ -167,8 +242,6 @@ function getEvents(){
 
 function renderEventList(data){
     let html = "";
-
-    console.log(data)
 
     Object.values(data).forEach(item => {
         html += `

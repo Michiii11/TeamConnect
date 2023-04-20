@@ -91,24 +91,6 @@ class UserRepository
         }
     }
 
-    function getTeams($id){
-        $sql = "select id, name, t.playerID as 'captain', user_team.playerID from user_team 
-                join team t on user_team.teamID = t.id
-                where user_team.playerID like {$id};";
-        try {
-            $result = $this->connection->query($sql);
-
-            $rows = array();
-            while ($row = $result->fetch_assoc()) {
-                $rows[$row["id"]] = $row;
-            }
-
-            return $rows;
-        } catch (mysqli_sql_exception $err) {
-            echo "SQL error occurred: " . $err->getMessage();
-        }
-    }
-
     function getPlayer($teamId){
         $sql = "select u.id as 'id', firstname, lastname, email, position, health, rule, height, weight from team
                 join user_team ut on team.id = teamID
@@ -146,7 +128,6 @@ class UserRepository
             echo "SQL error occurred: " . $err->getMessage();
         }
     }
-
 
     //getters & setters
     function getConnection()

@@ -54,17 +54,9 @@ else if (isset($_SESSION["loggedIn"]) && $_SESSION["loggedIn"]) {
     $response->loggedIn = true;
     $response->name = $users->getName($_SESSION["userID"]);
 
-    if($type == "getAsideData"){
-        $response->data = $users->getTeams($_SESSION["userID"]);
-    }
-
-    if($type == "getPlayer"){
-        $response->data = $users->getPlayer($_GET["teamID"]);
-    }
-
-    if($type == "getEvents"){
-        $response->userID = $_SESSION["userID"];
-        $response->data = $users->getEvents($_SESSION["userID"]);
+    switch($type){
+        case "getPlayer": $response->data = $users->getPlayer($_GET["teamID"]); break;
+        case "getEvents": $response->userID = $_SESSION["userID"]; $response->data = $users->getEvents($_SESSION["userID"]); break;
     }
 }
 else {

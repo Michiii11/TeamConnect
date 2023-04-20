@@ -162,7 +162,7 @@ insert into team (playerID, name) values (9, 'yaniks team');
 
 insert into user_team (playerID, teamID) values (8, 1);
 insert into user_team (playerID, teamID) values (9, 1);
-insert into user_team (playerID, teamID) values (9, 2);
+insert into user_team (playerID, teamID) values (9, 4);
 
 insert into event (teamID, type, duration) values (1, 'Konditionstraining', 1);
 insert into event (teamID, type, duration) values (1, 'Fußballtraining', 1);
