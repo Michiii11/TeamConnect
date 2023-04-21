@@ -55,8 +55,49 @@ button{
   background-color: transparent;
   border: none;
   color: $color-contrast;
+  padding: .5rem 1rem;
+  border-radius: .5rem;
   cursor: pointer;
   user-select: none;
+  transition: .2s all;
+
+  &.filled{
+    background-color: $primary-main;
+    color: $color-contrast;
+
+    &:hover{
+      background-color: $primary-dark;
+    }
+  }
+
+  &.filled:not([disabled]){
+    background-color: $primary-main;
+    color: $color-contrast;
+
+    &:hover{
+      background-color: $primary-dark;
+    }
+  }
+
+  &.secondary{
+    border: 2px solid $primary-main;
+    color: $primary-main;
+
+    &:hover{
+      border-color: $primary-dark;
+      color: $primary-dark;
+    }
+  }
+
+  &.outlined{
+    background-color: transparent;
+    border: 1px solid $color-contrast;
+
+    &:hover{
+      background-color: $color-contrast;
+      color: $gray-100;
+    }
+  }
 }
 
 p.newButton{
@@ -323,44 +364,19 @@ main.login{
     text-transform: uppercase;
   }
 }
-
 #login-container .buttons{
   display: flex;
   justify-content: space-around;
 
   button{
-    color: $primary-main;
     padding: .7rem 1.2rem;
     font: {
       weight: bold;
     };
     text-transform: uppercase;
-    transition: color .3s, background-color .3s;
 
-    &.main{
-      background-color: $primary-main;
+    &.filled{
       color: $gray-100;
-      border-radius: .5rem;
-
-      &:hover{
-        background-color: $primary-dark;
-      }
-    }
-
-    &.second{
-      background-color: $gray-100;
-
-      border: {
-        style: solid;
-        color: $primary-main;
-        width: .1rem;
-        radius: .5rem;
-      };
-
-      &:hover{
-        color: $primary-dark;
-        border-color: $primary-dark;
-      }
     }
   }
 }
@@ -461,18 +477,6 @@ main.login{
     border-radius: .5rem;
     padding: .5rem;
     margin-right: 1rem;
-  }
-
-  p {
-    cursor: pointer;
-    padding: .5rem 1rem;
-    border-radius: .5rem;
-    background-color: $primary-main;
-    transition: all .2s;
-
-    &:hover{
-      background-color: $primary-dark;
-    }
   }
 }
 //endregion
@@ -653,34 +657,8 @@ main.login{
     button{
       width: 5vw;
       padding: .5rem;
-      border-radius: .5rem;
-      border: 1px solid $color-contrast;
       cursor: pointer;
       transition: .2s all;
-
-      &:hover{
-        background-color: $color-contrast;
-        color: $gray-300;
-      }
-
-      &:last-child{
-        border-color: $primary-main;
-        color: $primary-main;
-
-        &:hover{
-          background-color: transparent;
-          color: $primary-main;
-        }
-      }
-
-      &:last-child:not([disabled]){
-        background-color: $primary-main;
-        color: $color-contrast;
-
-        &:hover{
-          background-color: $primary-dark;
-        }
-      }
     }
   }
 }

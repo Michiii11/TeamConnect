@@ -36,8 +36,41 @@ button {
   background-color: transparent;
   border: none;
   color: hsl(0, 0%, 100%);
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
   cursor: pointer;
   user-select: none;
+  transition: 0.2s all;
+}
+button.filled {
+  background-color: hsl(123, 43%, 39%);
+  color: hsl(0, 0%, 100%);
+}
+button.filled:hover {
+  background-color: hsl(123, 43%, 27%);
+}
+button.filled:not([disabled]) {
+  background-color: hsl(123, 43%, 39%);
+  color: hsl(0, 0%, 100%);
+}
+button.filled:not([disabled]):hover {
+  background-color: hsl(123, 43%, 27%);
+}
+button.secondary {
+  border: 2px solid hsl(123, 43%, 39%);
+  color: hsl(123, 43%, 39%);
+}
+button.secondary:hover {
+  border-color: hsl(123, 43%, 27%);
+  color: hsl(123, 43%, 27%);
+}
+button.outlined {
+  background-color: transparent;
+  border: 1px solid hsl(0, 0%, 100%);
+}
+button.outlined:hover {
+  background-color: hsl(0, 0%, 100%);
+  color: hsl(0, 0%, 5%);
 }
 
 p.newButton {
@@ -274,30 +307,12 @@ main.login .backgroundImage {
   justify-content: space-around;
 }
 #login-container .buttons button {
-  color: hsl(123, 43%, 39%);
   padding: 0.7rem 1.2rem;
   font-weight: bold;
   text-transform: uppercase;
-  transition: color 0.3s, background-color 0.3s;
 }
-#login-container .buttons button.main {
-  background-color: hsl(123, 43%, 39%);
+#login-container .buttons button.filled {
   color: hsl(0, 0%, 5%);
-  border-radius: 0.5rem;
-}
-#login-container .buttons button.main:hover {
-  background-color: hsl(123, 43%, 27%);
-}
-#login-container .buttons button.second {
-  background-color: hsl(0, 0%, 5%);
-  border-style: solid;
-  border-color: hsl(123, 43%, 39%);
-  border-width: 0.1rem;
-  border-radius: 0.5rem;
-}
-#login-container .buttons button.second:hover {
-  color: hsl(123, 43%, 27%);
-  border-color: hsl(123, 43%, 27%);
 }
 
 #login-container section {
@@ -387,16 +402,6 @@ main.login .backgroundImage {
   border-radius: 0.5rem;
   padding: 0.5rem;
   margin-right: 1rem;
-}
-.board section.chat .inputBox p {
-  cursor: pointer;
-  padding: 0.5rem 1rem;
-  border-radius: 0.5rem;
-  background-color: hsl(123, 43%, 39%);
-  transition: all 0.2s;
-}
-.board section.chat .inputBox p:hover {
-  background-color: hsl(123, 43%, 27%);
 }
 
 /*---------- PlayerBox ----------*/
@@ -552,29 +557,8 @@ main.login .backgroundImage {
 .popUp.active .content > div .buttons button {
   width: 5vw;
   padding: 0.5rem;
-  border-radius: 0.5rem;
-  border: 1px solid hsl(0, 0%, 100%);
   cursor: pointer;
   transition: 0.2s all;
-}
-.popUp.active .content > div .buttons button:hover {
-  background-color: hsl(0, 0%, 100%);
-  color: hsl(0, 0%, 15%);
-}
-.popUp.active .content > div .buttons button:last-child {
-  border-color: hsl(123, 43%, 39%);
-  color: hsl(123, 43%, 39%);
-}
-.popUp.active .content > div .buttons button:last-child:hover {
-  background-color: transparent;
-  color: hsl(123, 43%, 39%);
-}
-.popUp.active .content > div .buttons button:last-child:not([disabled]) {
-  background-color: hsl(123, 43%, 39%);
-  color: hsl(0, 0%, 100%);
-}
-.popUp.active .content > div .buttons button:last-child:not([disabled]):hover {
-  background-color: hsl(123, 43%, 27%);
 }
 
 /*---------- PopUp ----------*/

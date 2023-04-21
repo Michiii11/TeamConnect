@@ -43,8 +43,8 @@
 
                     <a onclick="toggleTeamCreate()">Eigenes Team erstellen</a>
                     <div class="buttons">
-                        <button onclick="togglePopUp()">Abbrechen</button>
-                        <button onclick="requestTeam()" disabled>Beitreten</button>
+                        <button class="outlined" onclick="togglePopUp()">Abbrechen</button>
+                        <button class="filled" onclick="requestTeam()" disabled>Beitreten</button>
                     </div>
                 </div>
 
@@ -56,8 +56,8 @@
                     <p class="error create"></p>
                     <a onclick="toggleTeamCreate()">Bestehendes Team beitreten</a>
                     <div class="buttons">
-                        <button onclick="togglePopUp()">Abbrechen</button>
-                        <button onclick="createTeam()">Erstellen</button>
+                        <button class="outlined" onclick="togglePopUp()">Abbrechen</button>
+                        <button class="filled" onclick="createTeam()">Erstellen</button>
                     </div>
                 </div>
             </div>
@@ -99,7 +99,7 @@
 
             <div class="inputBox">
                 <input id="chatInputField" type="text" placeholder="Schreibe eine Nachricht">
-                <p>Senden</p>
+                <button class="filled">Senden</button>
             </div>
         </section>
 
