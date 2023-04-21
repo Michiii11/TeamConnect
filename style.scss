@@ -595,7 +595,7 @@ main.login{
     div{
       margin-inline: auto;
       width: 80%;
-      height: 8vh;
+      max-height: 8vh;
       padding-block: .5rem;
       border: 1px solid $color-contrast;
       border-bottom-left-radius: .5rem;
@@ -668,8 +668,8 @@ main.login{
         color: $primary-main;
 
         &:hover{
-          background-color: $primary-main;
-          color: $color-contrast;
+          background-color: transparent;
+          color: $primary-main;
         }
       }
 
@@ -684,6 +684,19 @@ main.login{
     }
   }
 }
+//endregion
+
+/*---------- PopUp ----------*/
+//region error
+.error {
+  color: hsl(0, 100%, 64%);
+
+  &.create{
+    padding-top: 1rem;
+  }
+}
+
+
 //endregion
 
 /************ Imports ************/

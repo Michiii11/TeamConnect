@@ -30,11 +30,11 @@ class TeamRepository
         }
     }
 
-    function addTeam($id, $teamName){
+    function requestTeam($id, $teamName){
         try {
             $teamId = $this->getTeamByName($teamName);
 
-            $sql = "INSERT INTO user_team (playerID, teamID) VALUES ('$id', '$teamId')";
+            $sql = "INSERT INTO user_team_request (playerID, teamID) VALUES ('$id', '$teamId')";
             return mysqli_query($this->connection, $sql);
         } catch (mysqli_sql_exception $err) {
             echo "SQL error occured: " . $err->getMessage();
@@ -75,7 +75,8 @@ class TeamRepository
         $id = $_SESSION["userID"];
         $sql = "select id, name, t.playerID as 'captain', user_team.playerID from user_team
                 join team t on user_team.teamID = t.id
-                where id not in (select u.teamID from user_team u where u.playerID like $id);";
+                left outer join user_team_request utr on user_team.teamID = utr.teamID
+                where id not in (select u.teamID from user_team u where u.playerID like $id) and requestTime is null;";
         try {
             $result = $this->connection->query($sql);
 
@@ -93,6 +94,43 @@ class TeamRepository
         $sql = "select id, name, t.playerID as 'captain', user_team.playerID from user_team 
                 join team t on user_team.teamID = t.id
                 where user_team.playerID like {$id};";
+        try {
+            $result = $this->connection->query($sql);
+
+            $rows = array();
+            while ($row = $result->fetch_assoc()) {
+                $rows[$row["id"]] = $row;
+            }
+
+            return $rows;
+        } catch (mysqli_sql_exception $err) {
+            echo "SQL error occurred: " . $err->getMessage();
+        }
+    }
+
+    function getJoinRequests(){
+        $id = $_SESSION["userID"];
+        $sql = "select playerID, teamID, requestTime from user_team_request
+                where playerID like '$id';";
+        try {
+            $result = $this->connection->query($sql);
+
+            $rows = array();
+            while ($row = $result->fetch_assoc()) {
+                $rows[$row["id"]] = $row;
+            }
+
+            return $rows;
+        } catch (mysqli_sql_exception $err) {
+            echo "SQL error occurred: " . $err->getMessage();
+        }
+    }
+
+    function getTeamRequests(){
+        $id = $_SESSION["userID"];
+        $sql = "select utr.playerID, teamID, requestTime from user_team_request utr
+                join team t on utr.teamID like t.id
+                where t.playerID like '$id';";
         try {
             $result = $this->connection->query($sql);
 

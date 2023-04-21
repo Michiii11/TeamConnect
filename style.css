@@ -501,7 +501,7 @@ main.login .backgroundImage {
 .popUp.active .content > div .teamList div {
   margin-inline: auto;
   width: 80%;
-  height: 8vh;
+  max-height: 8vh;
   padding-block: 0.5rem;
   border: 1px solid hsl(0, 0%, 100%);
   border-bottom-left-radius: 0.5rem;
@@ -566,8 +566,8 @@ main.login .backgroundImage {
   color: hsl(123, 43%, 39%);
 }
 .popUp.active .content > div .buttons button:last-child:hover {
-  background-color: hsl(123, 43%, 39%);
-  color: hsl(0, 0%, 100%);
+  background-color: transparent;
+  color: hsl(123, 43%, 39%);
 }
 .popUp.active .content > div .buttons button:last-child:not([disabled]) {
   background-color: hsl(123, 43%, 39%);
@@ -575,6 +575,14 @@ main.login .backgroundImage {
 }
 .popUp.active .content > div .buttons button:last-child:not([disabled]):hover {
   background-color: hsl(123, 43%, 27%);
+}
+
+/*---------- PopUp ----------*/
+.error {
+  color: hsl(0, 100%, 64%);
+}
+.error.create {
+  padding-top: 1rem;
 }
 
 /************ Imports ************/

@@ -6,6 +6,7 @@ let currentTeamID
 function updateDashboard(){
     getPlayers();
     getEvents();
+    getTeamRequests();
 }
 
 /********* check login *********/
@@ -136,12 +137,14 @@ function togglePopUp(){
         document.querySelector(".popUp").classList.add("active");
         loadTeamList()
     }
+    document.querySelector(".popUp .active input").focus();
 }
 function toggleTeamCreate(){
     let activeDiv = document.querySelector(".popUp .add.active") ? "create" : "add"
 
     document.querySelector(".popUp .active").classList.remove("active");
     document.querySelector(`.popUp .${activeDiv}`).classList.add("active")
+    document.querySelector(".popUp .active input").focus();
 }
 
 let teams = {}
@@ -175,7 +178,7 @@ function addTeamToFilter(teamname){
 
     document.querySelector("#findTeamInput").addEventListener("keydown", function(event) {
         if (event.keyCode === 13) {
-            addTeam();
+            requestTeam();
         }
     });
 }
@@ -211,10 +214,61 @@ function filterTeam(){
 
     document.querySelector(".teamList div").innerHTML = html;
 }
-function addTeam() {
+
+/**
+ * sends a request to the team
+ */
+function requestTeam() {
     let input = document.querySelector("#findTeamInput").value;
     const data = {teamName: input};
-    fetch("./server/team.php/addTeam", {
+    fetch("./server/team.php/requestTeam", {
+        method: "POST", // or 'PUT'
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+    })
+        .then((response) => {
+            return response.json()
+        })
+        .then((data) => {
+            console.log(data)
+
+            loadTeamList();
+        })
+        .catch((error) => {
+            console.error(`Error:`, error);
+        });
+}
+
+/**
+ * sends a requested to the team
+ */
+function getTeamRequests() {
+    fetch(`./server/user.php/getTeamRequests`)
+        .then((response) => {
+           return response.json()
+        })
+        .then(answer=>{
+            console.log(answer)
+        })
+        .catch((error) => {
+            console.error("Error:", error);
+        });
+}
+
+function enterCreateTeam(){
+    document.querySelector("#createTeamInput").addEventListener("keydown", function(event) {
+        if (event.keyCode === 13) {
+            createTeam();
+        }
+    });
+}
+function createTeam() {
+    //todo fehlermeldung bei duplikaten
+    let name = document.querySelector("#createTeamInput").value;
+    const data = {teamName: name};
+    fetch("./server/team.php/createTeam", {
         method: "POST", // or 'PUT'
         headers: {
             "Content-Type": "application/json",
@@ -231,31 +285,7 @@ function addTeam() {
             togglePopUp();
         })
         .catch((error) => {
-            console.error(`Error:`, error);
-        });
-}
-
-function createTeam() {
-    //todo fehlermeldung bei duplikaten
-    let name = document.querySelector("#createTeamInput").value;
-    const data = {teamName: name};
-    fetch("./server/team.php/createTeam", {
-        method: "POST", // or 'PUT'
-        headers: {
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-    })
-        .then((response) => {
-            return response.text()
-        })
-        .then((data) => {
-            console.log(data)
-
-            getMyTeams()
-            togglePopUp();
-        })
-        .catch((error) => {
+            document.querySelector(".error.create").innerHTML = `Team Name ist bereits benutzt`
             console.error(`Error:`, error);
         });
 }

@@ -184,4 +184,9 @@ insert into user_team (playerID, teamID) values ('9', '23');
 
 select id, name, t.playerID as 'captain', user_team.playerID from user_team
 join team t on user_team.teamID = t.id
-where id not in (select u.teamID from user_team u where u.playerID like 8);
+left outer join user_team_request utr on user_team.teamID = utr.teamID
+where id not in (select u.teamID from user_team u where u.playerID like 9) and requestTime is null;
+
+select utr.playerID, teamID, requestTime from user_team_request utr
+join team t on utr.teamID like t.id
+where t.playerID like 8;

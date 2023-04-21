@@ -34,27 +34,26 @@
     <div class="board">
         <div class="popUp">
             <div class="content">
-                <div class="add active">
+                <div class="add">
                     <h2>Team beitreten</h2>
                     <div class="teamList">
-                        <input onkeyup="filterTeam()" id="findTeamInput" type="text" autofocus placeholder="Teamname">
-                        <div>
-
-                        </div>
+                        <input onkeyup="filterTeam()" id="findTeamInput" type="text" placeholder="Teamname">
+                        <div></div>
                     </div>
 
                     <a onclick="toggleTeamCreate()">Eigenes Team erstellen</a>
                     <div class="buttons">
                         <button onclick="togglePopUp()">Abbrechen</button>
-                        <button onclick="addTeam()" disabled>Beitreten</button>
+                        <button onclick="requestTeam()" disabled>Beitreten</button>
                     </div>
                 </div>
 
-                <div class="create">
+                <div class="create active">
                     <h2>Team erstellen</h2>
                     <i class="fa-solid fa-camera"></i>
-                    <input id="createTeamInput" type="text" autofocus placeholder="Teamname">
+                    <input onkeydown="enterCreateTeam()" id="createTeamInput" type="text" placeholder="Teamname">
 
+                    <p class="error create"></p>
                     <a onclick="toggleTeamCreate()">Bestehendes Team beitreten</a>
                     <div class="buttons">
                         <button onclick="togglePopUp()">Abbrechen</button>
