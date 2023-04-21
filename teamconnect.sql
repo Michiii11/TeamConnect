@@ -177,3 +177,11 @@ select eventID, type, DATE_FORMAT(date, '%d.%m.%Y') as 'date', date_format(time,
 join event e on ue.eventID = e.id
 join user u on ue.playerID = u.id
 where u.id = 8;
+
+select * from team where name = 'michis team';
+select * from user_team;
+insert into user_team (playerID, teamID) values ('9', '23');
+
+select id, name, t.playerID as 'captain', user_team.playerID from user_team
+join team t on user_team.teamID = t.id
+where id not in (select u.teamID from user_team u where u.playerID like 8);

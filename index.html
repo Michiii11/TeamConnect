@@ -37,7 +37,7 @@
                 <div class="add active">
                     <h2>Team beitreten</h2>
                     <div class="teamList">
-                        <input id="findTeamInput" type="text" autofocus placeholder="Teamname">
+                        <input onkeyup="filterTeam()" id="findTeamInput" type="text" autofocus placeholder="Teamname">
                         <div>
 
                         </div>
@@ -45,8 +45,8 @@
 
                     <a onclick="toggleTeamCreate()">Eigenes Team erstellen</a>
                     <div class="buttons">
-                        <p onclick="togglePopUp()">Abbrechen</p>
-                        <p onclick="addTeam()">Beitreten</p>
+                        <button onclick="togglePopUp()">Abbrechen</button>
+                        <button onclick="addTeam()" disabled>Beitreten</button>
                     </div>
                 </div>
 
@@ -57,8 +57,8 @@
 
                     <a onclick="toggleTeamCreate()">Bestehendes Team beitreten</a>
                     <div class="buttons">
-                        <p onclick="togglePopUp()">Abbrechen</p>
-                        <p onclick="createTeam()">Erstellen</p>
+                        <button onclick="togglePopUp()">Abbrechen</button>
+                        <button onclick="createTeam()">Erstellen</button>
                     </div>
                 </div>
             </div>

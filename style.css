@@ -32,6 +32,14 @@ input {
   border: 1px solid hsl(0, 0%, 20%);
 }
 
+button {
+  background-color: transparent;
+  border: none;
+  color: hsl(0, 0%, 100%);
+  cursor: pointer;
+  user-select: none;
+}
+
 p.newButton {
   color: hsl(123, 43%, 39%);
   border: 3px solid hsl(123, 43%, 39%);
@@ -191,7 +199,6 @@ main aside.sidebar section.buttons div i {
 
 /*---------- Login ----------*/
 main.login {
-  /*TODO this is offset i think*/
   height: 100vh;
   display: grid;
   place-items: center;
@@ -258,7 +265,7 @@ main.login .backgroundImage {
 #login-container .info {
   font-size: 0.9rem;
   margin-bottom: 0.5rem;
-  color: hsl(0, 0%, 80%);
+  color: hsl(0, 0%, 90%);
   text-transform: uppercase;
 }
 
@@ -472,6 +479,7 @@ main.login .backgroundImage {
 
 .popUp.active .content > div {
   display: none;
+  box-shadow: 0.2rem 0.2rem 0.2rem hsl(0, 0%, 30%);
   flex-direction: column;
   align-items: center;
   justify-content: space-between;
@@ -480,40 +488,53 @@ main.login .backgroundImage {
   border-radius: 1rem;
   padding: 3rem;
   width: 30vw;
-  height: 30vh;
 }
 .popUp.active .content > div.active {
   display: flex;
 }
 .popUp.active .content > div .teamList {
-  margin-block: 1rem;
+  margin-top: 0.5rem;
   width: 15vw;
   border-radius: 1rem;
   padding: 1rem;
 }
 .popUp.active .content > div .teamList div {
+  margin-inline: auto;
+  width: 80%;
   height: 8vh;
-  border-bottom: 1px solid hsl(0, 0%, 100%);
+  padding-block: 0.5rem;
+  border: 1px solid hsl(0, 0%, 100%);
+  border-bottom-left-radius: 0.5rem;
+  border-bottom-right-radius: 0.5rem;
+  border-top: none;
   overflow: auto;
   -ms-overflow-style: none;
   scrollbar-width: none;
+}
+.popUp.active .content > div .teamList div p {
+  padding-block: 0.1rem;
+  cursor: pointer;
+}
+.popUp.active .content > div .teamList div p:hover {
+  color: #b3b3b3;
 }
 .popUp.active .content > div .teamList div::-webkit-scrollbar {
   display: none;
 }
 .popUp.active .content > div input {
-  margin-bottom: 1rem;
   padding: 0.5rem;
   border: 2px solid hsl(0, 0%, 100%);
   color: hsl(0, 0%, 100%);
   background: none;
   border-radius: 0.5rem;
   width: 15vw;
+  box-sizing: border-box;
 }
 .popUp.active .content > div input:focus {
   border: 2px solid #b3b3b3;
 }
 .popUp.active .content > div a {
+  margin-top: 0.5rem;
   color: hsl(0, 0%, 100%);
   text-decoration: none;
   cursor: pointer;
@@ -528,7 +549,7 @@ main.login .backgroundImage {
   width: 50%;
   justify-content: space-between;
 }
-.popUp.active .content > div .buttons p {
+.popUp.active .content > div .buttons button {
   width: 5vw;
   padding: 0.5rem;
   border-radius: 0.5rem;
@@ -536,17 +557,24 @@ main.login .backgroundImage {
   cursor: pointer;
   transition: 0.2s all;
 }
-.popUp.active .content > div .buttons p:hover {
+.popUp.active .content > div .buttons button:hover {
   background-color: hsl(0, 0%, 100%);
   color: hsl(0, 0%, 15%);
 }
-.popUp.active .content > div .buttons p:last-child:hover {
+.popUp.active .content > div .buttons button:last-child {
+  border-color: hsl(123, 43%, 39%);
+  color: hsl(123, 43%, 39%);
+}
+.popUp.active .content > div .buttons button:last-child:hover {
   background-color: hsl(123, 43%, 39%);
   color: hsl(0, 0%, 100%);
 }
-.popUp.active .content > div .buttons p:last-child {
-  border-color: hsl(123, 43%, 39%);
-  color: hsl(123, 43%, 39%);
+.popUp.active .content > div .buttons button:last-child:not([disabled]) {
+  background-color: hsl(123, 43%, 39%);
+  color: hsl(0, 0%, 100%);
+}
+.popUp.active .content > div .buttons button:last-child:not([disabled]):hover {
+  background-color: hsl(123, 43%, 27%);
 }
 
 /************ Imports ************/

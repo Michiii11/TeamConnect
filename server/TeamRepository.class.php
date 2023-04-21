@@ -35,7 +35,7 @@ class TeamRepository
             $teamId = $this->getTeamByName($teamName);
 
             $sql = "INSERT INTO user_team (playerID, teamID) VALUES ('$id', '$teamId')";
-            mysqli_query($this->connection, $sql);
+            return mysqli_query($this->connection, $sql);
         } catch (mysqli_sql_exception $err) {
             echo "SQL error occured: " . $err->getMessage();
         }
@@ -72,8 +72,10 @@ class TeamRepository
     }
 
     function getAllTeams(){
-        $sql = "select id, name, t.playerID as 'captain', user_team.playerID from user_team 
-                join team t on user_team.teamID = t.id;";
+        $id = $_SESSION["userID"];
+        $sql = "select id, name, t.playerID as 'captain', user_team.playerID from user_team
+                join team t on user_team.teamID = t.id
+                where id not in (select u.teamID from user_team u where u.playerID like $id);";
         try {
             $result = $this->connection->query($sql);
 
