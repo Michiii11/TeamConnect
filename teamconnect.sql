@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Erstellungszeit: 13. Apr 2023 um 16:41
+-- Erstellungszeit: 01. Jun 2023 um 10:30
 -- Server-Version: 10.4.28-MariaDB
 -- PHP-Version: 8.2.4
 
@@ -17,6 +17,10 @@ SET time_zone = "+00:00";
 /*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
 /*!40101 SET NAMES utf8mb4 */;
 
+--
+-- Datenbank: `teamconnect`
+--
+
 -- --------------------------------------------------------
 
 --
@@ -28,11 +32,23 @@ CREATE TABLE `event` (
   `teamID` int(11) NOT NULL,
   `date` date NOT NULL DEFAULT current_timestamp(),
   `time` timestamp NOT NULL DEFAULT current_timestamp(),
-  `type` varchar(50) NOT NULL,
-  `duration` int(50) NOT NULL,
-  `result` varchar(100) NOT NULL,
-  `note` varchar(300) NOT NULL
+  `type` varchar(50) DEFAULT NULL,
+  `description` varchar(100) NOT NULL,
+  `duration` int(50) DEFAULT NULL,
+  `result` varchar(100) DEFAULT NULL,
+  `note` varchar(300) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Daten für Tabelle `event`
+--
+
+INSERT INTO `event` (`id`, `teamID`, `date`, `time`, `type`, `description`, `duration`, `result`, `note`) VALUES
+(1, 1, '2023-04-17', '2023-04-17 06:18:33', 'Konditionstraining', '', 1, NULL, NULL),
+(2, 1, '2023-04-17', '2023-04-17 06:18:33', 'Fußballtraining', '', 1, NULL, NULL),
+(3, 1, '2023-04-17', '2023-04-17 06:18:33', 'Spiel', 'Spiel gegen LASK Linz', 1, NULL, NULL),
+(12, 23, '2023-06-08', '0000-00-00 00:00:00', 'Fußballtraining', '', 1, NULL, NULL),
+(13, 19, '2023-06-21', '0000-00-00 00:00:00', 'Fußballtraining', '', 2, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -46,6 +62,24 @@ CREATE TABLE `team` (
   `name` varchar(100) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Daten für Tabelle `team`
+--
+
+INSERT INTO `team` (`id`, `playerID`, `name`) VALUES
+(1, 8, 'michis team'),
+(4, 9, 'yaniks team'),
+(18, 8, 'leons team'),
+(19, 8, 'yanik'),
+(20, 8, 'leons'),
+(23, 8, 'test'),
+(25, 9, 'leons teams'),
+(28, 9, 'leons teamer'),
+(29, 9, 'teams'),
+(30, 9, 'taem'),
+(31, 9, 'lköjh'),
+(32, 9, 'stevan vlajic');
+
 -- --------------------------------------------------------
 
 --
@@ -58,11 +92,20 @@ CREATE TABLE `user` (
   `lastname` varchar(50) NOT NULL,
   `email` varchar(100) NOT NULL,
   `password` varchar(255) NOT NULL,
+  `position` varchar(20) NOT NULL,
   `health` varchar(50) NOT NULL,
   `rule` varchar(50) NOT NULL,
   `height` int(5) NOT NULL,
   `weight` int(5) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Daten für Tabelle `user`
+--
+
+INSERT INTO `user` (`id`, `firstname`, `lastname`, `email`, `password`, `position`, `health`, `rule`, `height`, `weight`) VALUES
+(8, 'Michael', 'Leisch', 'michael.leisch@gmx.at', '$2y$10$D750CvJDZFfTrwVcfYDF8eO1FCCqb6.YCW8XpgHJHdScWr5Bx6.3a', '', '', '', 0, 0),
+(9, 'Yanik', 'Kendler', 'yanik.kendler@gmail.com', '$2y$10$ngrt8eDQB6OT2trgoXE9duRb.VavmNL5DswlY.ooyh4TWfR4Buup.', '', '', '', 0, 0);
 
 -- --------------------------------------------------------
 
@@ -73,10 +116,19 @@ CREATE TABLE `user` (
 CREATE TABLE `user_event` (
   `eventID` int(11) NOT NULL,
   `playerID` int(11) NOT NULL,
-  `goal` int(10) NOT NULL,
-  `assist` int(10) NOT NULL,
-  `rating` varchar(50) NOT NULL
+  `goal` int(10) DEFAULT NULL,
+  `assist` int(10) DEFAULT NULL,
+  `rating` varchar(50) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Daten für Tabelle `user_event`
+--
+
+INSERT INTO `user_event` (`eventID`, `playerID`, `goal`, `assist`, `rating`) VALUES
+(1, 8, NULL, NULL, NULL),
+(2, 8, NULL, NULL, NULL),
+(3, 8, NULL, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -88,6 +140,34 @@ CREATE TABLE `user_team` (
   `playerID` int(11) NOT NULL,
   `teamID` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Daten für Tabelle `user_team`
+--
+
+INSERT INTO `user_team` (`playerID`, `teamID`) VALUES
+(8, 0),
+(8, 1),
+(8, 18),
+(8, 19),
+(8, 20),
+(8, 23),
+(8, 29),
+(8, 30),
+(8, 32),
+(8, 33),
+(9, 0),
+(9, 1),
+(9, 18),
+(9, 19),
+(9, 20),
+(9, 23),
+(9, 25),
+(9, 28),
+(9, 29),
+(9, 30),
+(9, 31),
+(9, 32);
 
 --
 -- Indizes der exportierten Tabellen
@@ -132,61 +212,21 @@ ALTER TABLE `user_team`
 -- AUTO_INCREMENT für Tabelle `event`
 --
 ALTER TABLE `event`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
 
 --
 -- AUTO_INCREMENT für Tabelle `team`
 --
 ALTER TABLE `team`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=37;
 
 --
 -- AUTO_INCREMENT für Tabelle `user`
 --
 ALTER TABLE `user`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
---
--- Datenbank: `test`
---
-CREATE DATABASE IF NOT EXISTS `test` DEFAULT CHARACTER SET latin1 COLLATE latin1_swedish_ci;
-USE `test`;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
-
-
-insert into team (playerID, name) values (8, 'michis team');
-insert into team (playerID, name) values (9, 'yaniks team');
-
-insert into user_team (playerID, teamID) values (8, 1);
-insert into user_team (playerID, teamID) values (9, 1);
-insert into user_team (playerID, teamID) values (9, 4);
-
-insert into event (teamID, type, duration) values (1, 'Konditionstraining', 1);
-insert into event (teamID, type, duration) values (1, 'Fußballtraining', 1);
-insert into event (teamID, type, duration) values (1, 'Spiel gegen LASK Linz', 1);
-
-insert into user_event(eventID, playerID) values (1, 8);
-insert into user_event(eventID, playerID) values (2, 8);
-insert into user_event(eventID, playerID) values (3, 8);
-
-
-select eventID, type, DATE_FORMAT(date, '%d.%m.%Y') as 'date', date_format(time, '%h:%m') as 'time' from user_event ue
-join event e on ue.eventID = e.id
-join user u on ue.playerID = u.id
-where u.id = 8;
-
-select * from team where name = 'michis team';
-select * from user_team;
-insert into user_team (playerID, teamID) values ('9', '23');
-
-select id, name, t.playerID as 'captain', user_team.playerID from user_team
-join team t on user_team.teamID = t.id
-left outer join user_team_request utr on user_team.teamID = utr.teamID
-where id not in (select u.teamID from user_team u where u.playerID like 9) and requestTime is null;
-
-select utr.playerID, teamID, requestTime from user_team_request utr
-join team t on utr.teamID like t.id
-where t.playerID like 8;

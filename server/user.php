@@ -56,7 +56,7 @@ else if (isset($_SESSION["loggedIn"]) && $_SESSION["loggedIn"]) {
 
     switch($type){
         case "getPlayer": $response->data = $users->getPlayer($_GET["teamID"]); break;
-        case "getEvents": $response->userID = $_SESSION["userID"]; $response->data = $users->getEvents($_SESSION["userID"]); break;
+        case "getUserID": $response->data = $_SESSION["userID"]; break;
     }
 }
 else {

@@ -72,8 +72,7 @@ button.outlined:hover {
   background-color: hsl(0, 0%, 100%);
   color: hsl(0, 0%, 5%);
 }
-
-p.newButton {
+button.newButton {
   color: hsl(123, 43%, 39%);
   border: 3px solid hsl(123, 43%, 39%);
   font-weight: bold;
@@ -84,11 +83,11 @@ p.newButton {
   margin: auto 2rem 2rem;
   transition: all 0.2s;
 }
-p.newButton:hover {
+button.newButton:hover {
   color: hsl(123, 27%, 51%);
   border-color: hsl(123, 27%, 51%);
 }
-p.newButton i {
+button.newButton i {
   margin-right: 1rem;
 }
 
@@ -221,6 +220,7 @@ main aside.sidebar section.buttons div {
   padding-block: 0.75rem;
   padding-left: 0.5rem;
   cursor: pointer;
+  user-select: none;
   transition: all 0.2s;
 }
 main aside.sidebar section.buttons div:hover {
@@ -322,17 +322,103 @@ main.login .backgroundImage {
   display: block;
 }
 
+/*---------- Settings ----------*/
+.userSettings {
+  display: none;
+  width: 95%;
+  margin-left: 2.5%;
+  height: 90vh;
+  border: 1px solid hsl(0, 0%, 25%);
+  border-radius: 1rem;
+  color: hsl(0, 0%, 100%);
+  background-color: hsl(0, 0%, 18%);
+}
+.userSettings.active {
+  display: flex;
+  flex-direction: column;
+}
+.userSettings div {
+  display: flex;
+  align-items: center;
+}
+.userSettings input, .userSettings select {
+  margin-left: 1rem;
+  background-color: transparent;
+  border-radius: 0.5rem;
+  color: hsl(0, 0%, 100%);
+  width: 20%;
+}
+.userSettings select {
+  border: none;
+}
+.userSettings select option {
+  background: hsl(0, 0%, 18%);
+}
+
+.userSettings section {
+  padding-block: 2rem;
+  width: 80%;
+  margin-inline: auto;
+  height: fit-content;
+  border-bottom: 2px solid hsl(0, 0%, 100%);
+}
+.userSettings section i {
+  font-size: 3rem;
+  margin-right: 1rem;
+  cursor: pointer;
+}
+.userSettings section.personal div {
+  margin-block: 1rem;
+}
+.userSettings section.personal div p:nth-child(2) {
+  margin-left: 1rem;
+}
+.userSettings section.personal div:not(.first) {
+  margin-left: 4rem;
+}
+.userSettings section.security input {
+  padding: 0.5rem;
+  margin-left: 2rem;
+}
+.userSettings section.security p {
+  margin-left: 2rem;
+  cursor: pointer;
+}
+.userSettings section.teams h3, .userSettings section.teams .section {
+  padding-block: 0.5rem;
+  margin-left: 4rem;
+}
+.userSettings section.teams i {
+  font-size: 1rem;
+}
+.userSettings section.teams .section {
+  border: none;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+.userSettings section.teams .section div {
+  padding: 1rem 0.5rem;
+  border: 1px solid hsl(0, 0%, 100%);
+  border-radius: 1rem;
+  margin: 0.5rem 2rem;
+}
+
 /*---------- Board ----------*/
 .board {
   box-sizing: border-box;
-  display: flex;
   position: relative;
-  justify-content: space-evenly;
   width: 100%;
   padding-top: 2.5vh;
   height: 95vh;
 }
-.board section {
+.board .sections {
+  display: none;
+}
+.board .sections.active {
+  display: flex;
+  justify-content: space-evenly;
+}
+.board .sections section {
   background-color: hsl(0, 0%, 15%);
   width: 30%;
   height: 90vh;
@@ -342,7 +428,7 @@ main.login .backgroundImage {
 }
 
 /*---------- ChatBox ----------*/
-.board section.chat .chatBox {
+.board .sections section.chat .chatBox {
   display: flex;
   flex-direction: column-reverse;
   height: 80vh;
@@ -351,7 +437,7 @@ main.login .backgroundImage {
   margin-top: auto;
 }
 
-.board section.chat .messageBox {
+.board .sections section.chat .messageBox {
   display: flex;
   align-items: start;
   text-align: left;
@@ -363,26 +449,26 @@ main.login .backgroundImage {
   color: hsl(0, 0%, 100%);
   background-color: hsl(0, 0%, 18%);
 }
-.board section.chat .messageBox i {
+.board .sections section.chat .messageBox i {
   font-size: 1.5rem;
   padding: 0.5rem 0.8rem 0 0.5rem;
 }
-.board section.chat .messageBox.isMyMessage {
+.board .sections section.chat .messageBox.isMyMessage {
   margin-left: auto;
   background-color: hsl(123, 43%, 39%);
 }
-.board section.chat .messageBox.sameUser {
+.board .sections section.chat .messageBox.sameUser {
   margin-top: 0.1rem;
 }
-.board section.chat .messageBox.sameUser i {
+.board .sections section.chat .messageBox.sameUser i {
   opacity: 0;
   user-select: none;
 }
-.board section.chat .messageBox.sameUser div h3 {
+.board .sections section.chat .messageBox.sameUser div h3 {
   display: none;
 }
 
-.board section.chat .inputBox {
+.board .sections section.chat .inputBox {
   display: flex;
   height: 10vh;
   padding-inline: 1.2rem;
@@ -393,7 +479,7 @@ main.login .backgroundImage {
   border-top: 2px solid hsl(0, 0%, 100%);
   color: hsl(0, 0%, 100%);
 }
-.board section.chat .inputBox input {
+.board .sections section.chat .inputBox input {
   outline: none;
   border: 1px solid hsl(0, 0%, 100%);
   color: hsl(0, 0%, 100%);
@@ -439,15 +525,22 @@ main.login .backgroundImage {
   flex-direction: column;
 }
 
+.board section.calendar .eventCalendar {
+  width: 100%;
+  height: 50%;
+  background-color: hsl(0, 0%, 15%);
+}
+
 .board section.calendar .eventList {
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-top: auto;
   width: 100%;
-  max-height: 50%;
   overflow: auto;
   -ms-overflow-style: none;
+}
+.board section.calendar .eventList::-webkit-scrollbar {
+  display: none;
 }
 .board section.calendar .eventList .eventBox {
   display: flex;
@@ -457,7 +550,22 @@ main.login .backgroundImage {
   border-bottom: 1px solid hsl(0, 0%, 100%);
 }
 .board section.calendar .eventList .eventBox i {
+  font-size: 1rem;
   padding-inline: 1rem;
+}
+.board section.calendar .eventList .eventBox .controls {
+  margin-left: auto;
+}
+.board section.calendar .eventList .eventBox .controls i {
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+.board section.calendar .eventList .newEventList {
+  margin-bottom: 1rem;
+}
+.board section.calendar .eventList .newEventList select, .board section.calendar .eventList .newEventList option, .board section.calendar .eventList .newEventList input {
+  background-color: hsl(0, 0%, 18%);
+  color: hsl(0, 0%, 100%);
 }
 
 /*---------- PopUp ----------*/

@@ -110,25 +110,6 @@ class UserRepository
         }
     }
 
-    function getEvents($id){
-        $sql = "select eventID as 'id', type, DATE_FORMAT(date, '%d.%m.%Y') as 'date', date_format(time, '%h:%m') as 'time' from user_event ue
-                join event e on ue.eventID = e.id
-                join user u on ue.playerID = u.id
-                where u.id = $id;";
-        try {
-            $result = $this->connection->query($sql);
-
-            $rows = array();
-            while ($row = $result->fetch_assoc()) {
-                $rows[$row["id"]] = $row;
-            }
-
-            return $rows;
-        } catch (mysqli_sql_exception $err) {
-            echo "SQL error occurred: " . $err->getMessage();
-        }
-    }
-
     //getters & setters
     function getConnection()
     {

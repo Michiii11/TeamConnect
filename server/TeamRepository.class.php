@@ -108,6 +108,32 @@ class TeamRepository
         }
     }
 
+    function getEvents($id){
+        $sql = "select id, teamID, type, description, DATE_FORMAT(date, '%d.%m.%Y') as 'date', time from event
+                where teamID like '{$id}';";
+        try {
+            $result = $this->connection->query($sql);
+
+            $rows = array();
+            while ($row = $result->fetch_assoc()) {
+                $rows[$row["id"]] = $row;
+            }
+
+            return $rows;
+        } catch (mysqli_sql_exception $err) {
+            echo "SQL error occurred: " . $err->getMessage();
+        }
+    }
+
+    function addEvent($teamID, $type, $description, $date, $time, $duration){
+        try {
+            $sql = "insert into event (teamID, date, time, type, description, duration) values ('$teamID', '$date', '$time', '$type', '$description', '$duration')";
+            mysqli_query($this->connection, $sql);
+        } catch (mysqli_sql_exception $err) {
+            echo "SQL error occured: " . $err->getMessage();
+        }
+    }
+
     function getJoinRequests(){
         $id = $_SESSION["userID"];
         $sql = "select playerID, teamID, requestTime from user_team_request

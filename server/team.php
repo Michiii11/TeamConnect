@@ -25,6 +25,8 @@ if (isset($_SESSION["loggedIn"]) && $_SESSION["loggedIn"]) {
         case "getTeamRequests": $response->data = $teams->getTeamRequests(); break;
         case "createTeam": $response->data = $teams->createTeam($_SESSION["userID"], $postBody->teamName); break;
         case "requestTeam": $response->data = $teams->requestTeam($_SESSION["userID"], $postBody->teamName); break;
+        case "getEvents": $response->data = $teams->getEvents($_GET["teamID"]); break;
+        case "addEvent": $response->data = $teams->addEvent($postBody->teamID, $postBody->type, $postBody->description, $postBody->date, $postBody->time, $postBody->duration); break;
     }
 } else {
     $response->message = "Not Logged in!";

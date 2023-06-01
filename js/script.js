@@ -1,5 +1,6 @@
 /********* variables *********/
 let userName
+let userID
 let currentTeamName
 let currentTeamID
 
@@ -12,6 +13,7 @@ function updateDashboard(){
 /********* check login *********/
 //region
 checkLogin()
+getUserID();
 
 /**
  * checks if the current user is logged in
@@ -30,6 +32,18 @@ function checkLogin(){
                 userName = answer.name;
                 document.querySelector(".userName").innerHTML = userName;
             }
+        })
+        .catch((error) => {
+            console.error("Error:", error);
+        });
+}
+function getUserID(){
+    fetch(`./server/user.php/getUserID`)
+        .then((response) => {
+            return response.json()
+        })
+        .then(answer=>{
+            userID = answer.data
         })
         .catch((error) => {
             console.error("Error:", error);
@@ -318,12 +332,15 @@ function renderPlayers(data){
                     <h2>${item.firstname} ${item.lastname}</h2>
                     <p>RM - GESUND - STAMMSPIELER</p>
                 </div>
-                <i class="fa-sharp fa-solid fa-pen"></i>
-            </div>
-        `
+                <i onclick="editPlayer(${item.id})" class="fa-sharp fa-solid fa-pen"></i>
+            </div>`
     });
 
     document.querySelector(".board section.player").innerHTML = html
+}
+
+function editPlayer(item){
+    console.log(item)
 }
 //endregion
 
@@ -331,9 +348,9 @@ function renderPlayers(data){
 /********* calendar box *********/
 //region
 function getEvents(){
-    fetch(`./server/user.php/getEvents`)
+    fetch(`./server/team.php/getEvents?teamID=${currentTeamID}`)
         .then((response) => {
-            return response.json()
+            return response.json();
         })
         .then(answer=>{
             renderEventList(answer.data)
@@ -349,9 +366,9 @@ function renderEventList(data){
     Object.values(data).forEach(item => {
         html += `
             <div class="eventBox">
-                <i class="fa-solid fa-trophy"></i>
+                ${getEventIcon(item.type)}
                 <div>
-                    <h4>${item.type}</h4>
+                    <h4>${item.description ? item.description : item.type}</h4>
                     <p>${getDayByDate(item.date)}, ${item.date} - ${item.time} Uhr</p>
                 </div>
             </div>
@@ -360,6 +377,79 @@ function renderEventList(data){
 
     document.querySelector(".board section.calendar .eventList").innerHTML = html
 }
+
+function getEventIcon(eventType){
+    switch (eventType){
+        case "Spiel": return `<i class="fa-solid fa-trophy"></i>`; break;
+        case "Fußballtraining": return `<i class="fa-solid fa-futbol"></i>`; break;
+        case "Konditionstraining": return `<i class="fa-solid fa-dumbbell"></i>`; break;
+    }
+}
+
+function toggleNewEventField(){
+    console.log("test")
+    if(!document.querySelector(".newEventList")){
+        document.querySelector(".eventList").innerHTML += `
+        <div class="eventBox newEventList">
+            <div class="newEventIcon">
+                <i class="fa-solid fa-futbol"></i>
+            </div>
+            <div>
+                <h4>
+                    <select name="typeSelector" id="typeSelector" onchange="updateIconOnNewEventField()">
+                        <option value="Fußballtraining">Fußballtraining</option>
+                        <option value="Konditionstraining">Konditionstraining</option>
+                        <option value="Spiel">Spiel</option>
+                    </select>
+                    <input type="text" id="descriptionInput" placeholder="Beschreibung">
+                </h4>
+                <p><input type="date" id="dateInput"><input type="time" id="timeInput"><input type="number" id="durationInput" placeholder="Dauer in h"></p>
+            </div>
+            <div class="controls">
+                <i onclick="toggleNewEventField()" class="fa-solid fa-xmark"></i>
+                <i onclick="addEvent()" class="fa-solid fa-check"></i>
+            </div>
+        </div>`
+
+        document.querySelector(".eventList").scrollTo(0, 100)
+    } else{
+        document.querySelector(".newEventList").remove();
+    }
+}
+function updateIconOnNewEventField(){
+    document.querySelector(".newEventIcon").innerHTML = getEventIcon(document.querySelector("#typeSelector").value)
+}
+function addEvent(){
+    let type = document.querySelector("#typeSelector").value;
+    let description = document.querySelector("#descriptionInput").value;
+    let date = document.querySelector("#dateInput").value;
+    let time = document.querySelector("#timeInput").value;
+    let duration = document.querySelector("#durationInput").value;
+
+    if(type !== "" && date !== "" && time !== "" && duration !== ""){
+        const data = {teamID: currentTeamID, type: type, description: description, date: date, time: time, duration: duration};
+        fetch("./server/team.php/addEvent", {
+            method: "POST", // or 'PUT'
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(data),
+        })
+            .then((response) => {
+                return response.json()
+            })
+            .then((data) => {
+                toggleNewEventField();
+                getEvents()
+            })
+            .catch((error) => {
+                console.error(`Error:`, error);
+            });
+    }else{
+        console.log("Error")
+    }
+}
+
 function getDayByDate(dateStr){
     dateStr = '15.04.2023';
     let parts = dateStr.split('.');
@@ -374,3 +464,32 @@ function getDayByDate(dateStr){
     return dayOfWeek;
 }
 //endregion
+
+
+/********* settings *********/
+//region
+function toggleUserSettings(){
+    document.querySelector(".userSettings").classList.toggle("active")
+    document.querySelector(".board .sections").classList.toggle("active")
+
+    fetch(`./server/team.php/getTeams`)
+        .then((response) => {
+            return response.json()
+        })
+        .then(answer=>{
+            let html = "";
+            Object.values(answer.data).forEach(item => {
+                html += `
+                    <div>
+                        <i class="fa-solid fa-circle-user"></i>
+                        <p>${item.name}</p>
+                        <i class="fa-solid fa-pen"></i>
+                        <i class="fa-solid fa-trash"></i>
+                    </div>`
+            })
+            document.querySelector(".userSettings .teams .section").innerHTML = html;
+        })
+        .catch((error) => {
+            console.error("Error:", error);
+        });
+}
