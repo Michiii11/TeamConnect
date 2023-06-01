@@ -53,10 +53,14 @@ else if ($type == "sign_up") {
 else if (isset($_SESSION["loggedIn"]) && $_SESSION["loggedIn"]) {
     $response->loggedIn = true;
     $response->name = $users->getName($_SESSION["userID"]);
+    $response->personalData = $users->getPersonalData($_SESSION["userID"]);
 
     switch($type){
         case "getPlayer": $response->data = $users->getPlayer($_GET["teamID"]); break;
         case "getUserID": $response->data = $_SESSION["userID"]; break;
+        case "updatePersonalData": $users->updatePersonalData($_SESSION["userID"], $postBody->firstname, $postBody->lastname, $postBody->email, $postBody->position, $postBody->health, $postBody->rule, $postBody->height, $postBody->weight); break;
+        case "updatePassword": $users->updatePassword($_SESSION["userID"], $postBody->password);break;
+        case "checkPassword": $response->data = $users->checkPassword($_SESSION["userID"], $postBody->password); break;
     }
 }
 else {

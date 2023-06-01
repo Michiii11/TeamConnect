@@ -1,6 +1,6 @@
 /********* variables *********/
-let userName
-let userID
+let personalData
+
 let currentTeamName
 let currentTeamID
 
@@ -13,7 +13,6 @@ function updateDashboard(){
 /********* check login *********/
 //region
 checkLogin()
-getUserID();
 
 /**
  * checks if the current user is logged in
@@ -29,21 +28,10 @@ function checkLogin(){
                 window.location.replace(document.location.href + "/login.html");
             }
             else{
-                userName = answer.name;
-                document.querySelector(".userName").innerHTML = userName;
+                personalData = answer.personalData;
+
+                document.querySelector(".userName").innerHTML = personalData.firstname + " " + personalData.lastname;
             }
-        })
-        .catch((error) => {
-            console.error("Error:", error);
-        });
-}
-function getUserID(){
-    fetch(`./server/user.php/getUserID`)
-        .then((response) => {
-            return response.json()
-        })
-        .then(answer=>{
-            userID = answer.data
         })
         .catch((error) => {
             console.error("Error:", error);
@@ -142,16 +130,15 @@ function selectTeam(elem, id){
 //endregion
 
 
-/********* popup *********/
+/********* popup add team *********/
 //region
 function togglePopUp(){
-    if(document.querySelector(".popUp.active")){
-        document.querySelector(".popUp.active").classList.remove("active");
-    } else{
-        document.querySelector(".popUp").classList.add("active");
+    document.querySelector(".popUp.addTeam").classList.toggle("active");
+    if(!document.querySelector(".popUp.addTeam.active")){
+        document.querySelector(".error.create").innerHTML = ""
         loadTeamList()
     }
-    document.querySelector(".popUp .active input").focus();
+    document.querySelector(".popUp.addTeam .active input").focus();
 }
 function toggleTeamCreate(){
     let activeDiv = document.querySelector(".popUp .add.active") ? "create" : "add"
@@ -279,29 +266,33 @@ function enterCreateTeam(){
     });
 }
 function createTeam() {
-    //todo fehlermeldung bei duplikaten
     let name = document.querySelector("#createTeamInput").value;
-    const data = {teamName: name};
-    fetch("./server/team.php/createTeam", {
-        method: "POST", // or 'PUT'
-        headers: {
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-    })
-        .then((response) => {
-            return response.json()
-        })
-        .then((data) => {
-            console.log(data)
 
-            getMyTeams()
-            togglePopUp();
+    if (name.length >= 3) {
+        const data = {teamName: name};
+        fetch("./server/team.php/createTeam", {
+            method: "POST", // or 'PUT'
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(data),
         })
-        .catch((error) => {
-            document.querySelector(".error.create").innerHTML = `Team Name ist bereits benutzt`
-            console.error(`Error:`, error);
-        });
+            .then((response) => {
+                return response.json()
+            })
+            .then((data) => {
+                console.log(data)
+
+                getMyTeams()
+                togglePopUp();
+            })
+            .catch((error) => {
+                document.querySelector(".error.create").innerHTML = `Team Name ist bereits benutzt`
+                console.error(`Error:`, error);
+            });
+    } else {
+        document.querySelector(".error.create").innerHTML = `Der Name muss mindestens aus 3 Zeichen bestehen`
+    }
 }
 //endregion
 
@@ -471,6 +462,7 @@ function getDayByDate(dateStr){
 function toggleUserSettings(){
     document.querySelector(".userSettings").classList.toggle("active")
     document.querySelector(".board .sections").classList.toggle("active")
+    updatePersonalDataInputs();
 
     fetch(`./server/team.php/getTeams`)
         .then((response) => {
@@ -481,7 +473,7 @@ function toggleUserSettings(){
             Object.values(answer.data).forEach(item => {
                 html += `
                     <div>
-                        <i class="fa-solid fa-circle-user"></i>
+                        <img src="img/userIcon.png" alt="userIcon">
                         <p>${item.name}</p>
                         <i class="fa-solid fa-pen"></i>
                         <i class="fa-solid fa-trash"></i>
@@ -492,4 +484,128 @@ function toggleUserSettings(){
         .catch((error) => {
             console.error("Error:", error);
         });
+}
+
+function updatePersonalDataInputs(){
+    for (const argumentsKey in personalData) {
+        if(document.querySelector(`#${argumentsKey}`)){
+            document.querySelector(`#${argumentsKey}`).value = personalData[argumentsKey]
+        }
+    }
+}
+
+function updatePersonalData(){
+    for (const argumentsKey in personalData) {
+        if(document.querySelector(`#${argumentsKey}`)){
+            personalData[argumentsKey] = document.querySelector(`#${argumentsKey}`).value
+        }
+    }
+
+    fetch("./server/user.php/updatePersonalData", {
+        method: "POST", // or 'PUT'
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify(personalData),
+    })
+        .then((response) => {
+            return response.json()
+        })
+        .then((data) => {
+            document.querySelector(".success.personal").innerHTML = "Persönliche Daten wurden erfolgreich geändert"
+            clearSuccessErrorAfterPeriod(3);
+        })
+        .catch((error) => {
+            document.querySelector(".error.personal").innerHTML = "Es gab einen Fehler beim Speichern der Daten"
+            console.error(`Error:`, error);
+        });
+}
+
+async function checkPassword(password){
+    let isCorrectPassword;
+    const data = {password: password};
+
+    try {
+        const response = await fetch("./server/user.php/checkPassword", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(data),
+        });
+
+        const responseData = await response.json();
+
+        isCorrectPassword = responseData.data;
+        return isCorrectPassword;
+    } catch (error) {
+        console.error("Error:", error);
+    }
+}
+
+function updatePassword(){
+    let currPassword = document.querySelector("#currPassword").value;
+    let newPassword = document.querySelector("#newPassword").value;
+    let repeatNewPassword = document.querySelector("#repeatNewPassword").value;
+    let validPassword = /(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+-=\[\]{}|;':",./<>?])[A-Za-z\d!@#$%^&*()_+-=\[\]{}|;':",./<>?]{8,}/
+    let errorField = document.querySelector(".error.security")
+
+    if(checkPassword(currPassword) === false){
+        errorField.innerHTML = "Das alte Passwort ist nicht korrekt"
+    } else if(newPassword !== repeatNewPassword){
+        errorField.innerHTML = "Die Passwörter stimmen nicht überein"
+    } else if(!validPassword.test(newPassword)){
+        errorField.innerHTML = "Das Passwort ist nicht sicher genug. (2 special chars or numbers, lower and uppercase letters)"
+    } else if(newPassword.length < 8 || newPassword.length > 100){
+        errorField.innerHTML = "Das Password darf min 8 und max 100 Zeichen haben."
+    } else{
+        const data = {password: newPassword};
+        fetch("./server/user.php/updatePassword", {
+            method: "POST", // or 'PUT'
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(data),
+        })
+            .then((response) => {
+                return response.json()
+            })
+            .then((data) => {
+                document.querySelector("#currPassword").value = "";
+                document.querySelector("#newPassword").value = "";
+                document.querySelector("#repeatNewPassword").value = "";
+                document.querySelector(".success.security").innerHTML = "Passwort wurde erfolgreich geändert"
+                clearSuccessErrorAfterPeriod(3);
+            })
+            .catch((error) => {
+                document.querySelector(".error.personal").innerHTML = "Es gab einen Fehler beim Akutalisieren des Passwortes"
+                console.error(`Error:`, error);
+            });
+    }
+}
+
+function toggleLogoutInfo(){
+    document.querySelector(".popUp.logoutInfo").classList.toggle("active");
+}
+
+function logout(){
+    personalData = ""
+    currentTeamName = ""
+    currentTeamID = ""
+
+    window.location.replace(document.location.href + "/login.html");
+}
+
+function clearSuccessErrorAfterPeriod(time){
+    let timeToDisappear = (time ? time : 5) * 1000; // standard value 5 if there is no time given
+
+    setTimeout(() => {
+        document.querySelectorAll(".success").forEach(value => {
+            value.innerHTML = "";
+        })
+
+        document.querySelectorAll(".error").forEach(value => {
+            value.innerHTML = "";
+        })
+    }, timeToDisappear)
 }

@@ -45,6 +45,22 @@ class UserRepository
         }
     }
 
+    function checkPassword($id, $password){
+        try {
+            $sql = "SELECT password FROM user WHERE id = '$id'";
+
+            $result = $this->connection->query($sql);
+
+            if($result->num_rows == 0) return false;
+
+            $row = $result->fetch_assoc();
+
+            return password_verify($password, $row['password']);
+        } catch (mysqli_sql_exception $err) {
+            echo "Error while checking data...: " . $err;
+        }
+    }
+
     function emailUsed($email)
     {
         $sql = "select * from user where email = '$email'";
@@ -86,6 +102,42 @@ class UserRepository
                 $row = $result->fetch_assoc();
                 return $row["firstname"] . " " . $row["lastname"];
             }
+        } catch (mysqli_sql_exception $err) {
+            echo "SQL error occurred: " . $err->getMessage();
+        }
+    }
+
+    function getPersonalData($id){
+        $sql = "select id, firstname, lastname, email, position, health, rule, height, weight from user where id like $id;";
+        try {
+            $result = $this->connection->query($sql);
+            if ($result->num_rows == 0) {
+                return null;
+            } else {
+                return $result->fetch_assoc();
+            }
+
+        } catch (mysqli_sql_exception $err) {
+            echo "SQL error occurred: " . $err->getMessage();
+        }
+    }
+
+    function updatePersonalData($id, $firstname, $lastname, $email, $position, $health, $rule, $height, $weight){
+        $sql = "update user 
+                set firstname = '$firstname', lastname = '$lastname', email = '$email', position = '$position', health = '$health', rule = '$rule', height = '$height', weight = '$weight'
+                where id like '$id'";
+        try {
+            mysqli_query($this->connection, $sql);
+        } catch (mysqli_sql_exception $err) {
+            echo "SQL error occurred: " . $err->getMessage();
+        }
+    }
+
+    function updatePassword($id, $newPassword){
+        $hashedPW = password_hash($newPassword, PASSWORD_DEFAULT);
+        $sql = "update user set password = '$hashedPW' where id like '$id'";
+        try {
+            mysqli_query($this->connection, $sql);
         } catch (mysqli_sql_exception $err) {
             echo "SQL error occurred: " . $err->getMessage();
         }

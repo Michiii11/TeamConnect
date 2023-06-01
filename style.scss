@@ -439,9 +439,15 @@ main.login{
   border-bottom: 2px solid $color-contrast;
 
   i {
-    font-size: 3rem;
-    margin-right: 1rem;
+    font-size: 1.2rem;
+    margin-inline: 1rem;
     cursor: pointer;
+  }
+
+  img{
+    cursor: pointer;
+    width: 3rem;
+    margin-right: 1rem;
   }
 
   &.personal{
@@ -456,6 +462,10 @@ main.login{
         margin-left: 4rem;
       }
     }
+
+    input#subtitle{
+      font-size: 2rem;
+    }
   }
 
   &.security{
@@ -464,9 +474,8 @@ main.login{
       margin-left: 2rem;
     }
 
-    p{
+    button{
       margin-left: 2rem;
-      cursor: pointer;
     }
   }
 
@@ -697,6 +706,7 @@ main.login{
   inset: 0;
   display: grid;
   place-content: center;
+  text-align: center;
   background-color: hsla(0, 0, 0, 0.3);
   backdrop-filter: blur(5px);
   z-index: 10000;
@@ -798,6 +808,16 @@ main.login{
     }
   }
 }
+
+.popUp.logoutInfo{
+  p{
+    padding-block: 1rem;
+  }
+
+  button{
+    margin-inline: .5rem;
+  }
+}
 //endregion
 
 /*---------- PopUp ----------*/
@@ -808,6 +828,10 @@ main.login{
   &.create{
     padding-top: 1rem;
   }
+}
+
+.success {
+  color: hsl(100, 100%, 64%);
 }
 
 

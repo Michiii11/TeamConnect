@@ -363,9 +363,14 @@ main.login .backgroundImage {
   border-bottom: 2px solid hsl(0, 0%, 100%);
 }
 .userSettings section i {
-  font-size: 3rem;
-  margin-right: 1rem;
+  font-size: 1.2rem;
+  margin-inline: 1rem;
   cursor: pointer;
+}
+.userSettings section img {
+  cursor: pointer;
+  width: 3rem;
+  margin-right: 1rem;
 }
 .userSettings section.personal div {
   margin-block: 1rem;
@@ -376,13 +381,15 @@ main.login .backgroundImage {
 .userSettings section.personal div:not(.first) {
   margin-left: 4rem;
 }
+.userSettings section.personal input#subtitle {
+  font-size: 2rem;
+}
 .userSettings section.security input {
   padding: 0.5rem;
   margin-left: 2rem;
 }
-.userSettings section.security p {
+.userSettings section.security button {
   margin-left: 2rem;
-  cursor: pointer;
 }
 .userSettings section.teams h3, .userSettings section.teams .section {
   padding-block: 0.5rem;
@@ -578,6 +585,7 @@ main.login .backgroundImage {
   inset: 0;
   display: grid;
   place-content: center;
+  text-align: center;
   background-color: hsla(0, 0%, 0%, 0.3);
   backdrop-filter: blur(5px);
   z-index: 10000;
@@ -669,12 +677,23 @@ main.login .backgroundImage {
   transition: 0.2s all;
 }
 
+.popUp.logoutInfo p {
+  padding-block: 1rem;
+}
+.popUp.logoutInfo button {
+  margin-inline: 0.5rem;
+}
+
 /*---------- PopUp ----------*/
 .error {
   color: hsl(0, 100%, 64%);
 }
 .error.create {
   padding-top: 1rem;
+}
+
+.success {
+  color: hsl(100, 100%, 64%);
 }
 
 /************ Imports ************/
