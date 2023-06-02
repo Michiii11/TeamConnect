@@ -72,68 +72,73 @@
         </div>
 
         <div class="userSettings">
-            <section class="personal">
-                <div class="first">
-                    <img src="img/userIcon.png" alt="userIcon">
-                    <input type="text" id="firstname"><input type="text" id="lastname">
-                    <i class="fa-solid fa-floppy-disk" title="Speichern" onclick="updatePersonalData()"></i>
-                    <i class="fa-solid fa-right-from-bracket" title="Abmelden" onclick="toggleLogoutInfo()"></i>
-                </div>
+            <div class="container">
+                <section class="personal">
+                    <div class="first">
+                        <img src="img/userIcon.png" alt="userIcon">
+                        <input type="text" id="firstname"><input type="text" id="lastname">
+                    </div>
 
-                <div>
-                    <label for="email">Email:</label>
-                    <input type="email" id="email">
-                </div>
+                    <div class="details">
+                        <label for="email">Email:</label>
+                        <input type="email" id="email">
 
-                <div>
-                    <label for="height">Größe:</label>
-                    <input type="number" id="height">
+                        <label for="height">Größe:</label>
+                        <input type="number" id="height">
 
-                    <label for="weight">Gewicht:</label>
-                    <input type="number" id="weight">
-                </div>
+                        <label for="weight">Gewicht:</label>
+                        <input type="number" id="weight">
 
-                <div>
-                    <label>Gesundheit:</label>
-                    <select name="userHealth" id="health">
-                        <option value="Gesund">Gesund</option>
-                        <option value="Verletzt">Verletzt</option>
-                        <option value="Krank">Krank</option>
-                    </select>
+                        <label>Gesundheit:</label>
+                        <select name="userHealth" id="health">
+                            <option value="Gesund">Gesund</option>
+                            <option value="Verletzt">Verletzt</option>
+                            <option value="Krank">Krank</option>
+                        </select>
 
-                    <label>Position:</label>
-                    <select name="userPosition" id="position">
-                        <option value="TW">TW</option>
-                        <option value="LV">LV</option><option value="LAV">LAV</option><option value="TW">LIV</option>
-                        <option value="TW">IV</option>
-                        <option value="LV">RV</option><option value="LAV">RAV</option><option value="TW">RIV</option>
-                        <option value="ZM">ZM</option><option value="ZDM">ZDM</option><option value="ZOM">ZOM</option>
-                        <option value="LM">LM</option><option value="RM">RM</option>
-                        <option value="LF">LF</option><option value="RF">RF</option>
-                        <option value="LA">LA</option><option value="RA">RA</option>
-                        <option value="RS">LS</option><option value="RS">RS</option>
-                        <option value="MS">MS</option><option value="ST">ST</option>
-                    </select>
-                </div>
-                <p class="success personal"></p>
-                <p class="error personal"></p>
-            </section>
+                        <label>Position:</label>
+                        <select name="userPosition" id="position">
+                            <option value="TW">TW</option>
+                            <option value="LV">LV</option><option value="LAV">LAV</option><option value="TW">LIV</option>
+                            <option value="TW">IV</option>
+                            <option value="LV">RV</option><option value="LAV">RAV</option><option value="TW">RIV</option>
+                            <option value="ZM">ZM</option><option value="ZDM">ZDM</option><option value="ZOM">ZOM</option>
+                            <option value="LM">LM</option><option value="RM">RM</option>
+                            <option value="LF">LF</option><option value="RF">RF</option>
+                            <option value="LA">LA</option><option value="RA">RA</option>
+                            <option value="RS">LS</option><option value="RS">RS</option>
+                            <option value="MS">MS</option><option value="ST">ST</option>
+                        </select>
+                    </div>
 
-            <section class="security">
-                <div>
-                    <input type="password" id="currPassword" placeholder="Password">
-                    <input type="password" id="newPassword" placeholder="New Password">
-                    <input type="password" id="repeatNewPassword" placeholder="Repeat Password">
-                    <button class="outlined" onclick="updatePassword()">Passwort Aktualisieren</button>
-                </div>
-                <p class="success security"></p>
-                <p class="error security"></p>
-            </section>
+                    <div class="buttons">
+                        <button class="outlined" onclick="updatePersonalData()"><span class="text">Save</span><i class="fa-solid fa-floppy-disk icon" title="Speichern" onclick="updatePersonalData()"></i></button>
+                        <button class="outlined" onclick="toggleLogoutInfo()"><span class="text">Log out</span><i class="fa-solid fa-right-from-bracket icon" title="Abmelden" onclick="toggleLogoutInfo()"></i></button>
+                        <p class="success personal"></p>
+                        <p class="error personal"></p>
+                    </div>
+                </section>
 
-            <section class="teams">
-                <h3>Meine Teams</h3>
-                <div class="section"></div>
-            </section>
+                <hr>
+
+                <section class="security">
+                    <div>
+                        <input type="password" id="currPassword" placeholder="Password">
+                        <input type="password" id="newPassword" placeholder="New Password">
+                        <input type="password" id="repeatNewPassword" placeholder="Repeat Password">
+                        <button class="outlined" onclick="updatePassword()">Passwort Aktualisieren</button>
+                    </div>
+                    <p class="success security"></p>
+                    <p class="error security"></p>
+                </section>
+
+                <hr>
+
+                <section class="teams">
+                    <h3>Meine Teams</h3>
+                    <div class="section"></div>
+                </section>
+            </div>
         </div>
 
         <div class="sections active">
@@ -182,6 +187,11 @@
 
             <section class="calendar">
                 <div class="eventCalendar"></div>
+                <div class="eventListNav">
+                    <p class="active" onclick="filterEventList(this)">Upcoming</p>
+                    <p onclick="filterEventList(this)">Today</p>
+                    <p onclick="filterEventList(this)">All</p>
+                </div>
                 <div class="eventList"></div>
 
                 <button onclick="toggleNewEventField()" class="newButton"><i class="fa-solid fa-plus"></i>NEUER EINTRAG</button>

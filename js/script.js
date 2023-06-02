@@ -8,6 +8,7 @@ function updateDashboard(){
     getPlayers();
     getEvents();
     getTeamRequests();
+    loadCalendarGrid();
 }
 
 /********* check login *********/
@@ -338,6 +339,57 @@ function editPlayer(item){
 
 /********* calendar box *********/
 //region
+function loadCalendarGrid(){
+    let year = new Date().getFullYear();
+    let month = new Date().getMonth();
+    let today = new Date().getDate();
+
+    var monthNames = ["January", "February", "March", "April", "May", "June",
+        "July", "August", "September", "October", "November", "December"
+    ];
+    var monthDays = [31, 28 + isLeapYear(year), 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+
+    var firstDay = new Date(year, month, 1);
+    var startingDay = firstDay.getDay();
+    if (startingDay == 0) {
+        startingDay = 7;
+    }
+
+    var monthLength = monthDays[month];
+    if (month == 1) { // February
+        monthLength = isLeapYear(year) ? 29 : 28;
+    }
+
+    var monthHtml = "<table><tr><th colspan='7'>" + monthNames[month] + " " + year + "</th></tr>";
+    monthHtml += "<tr><th>Mon</th><th>Tue</th><th>Wed</th><th>Thu</th><th>Fri</th><th>Sat</th><th>Sun</th></tr><tr>";
+
+    var day = 1;
+    // fill in the days
+    for (var i = 1; i <= 42; i++) {
+        if (i < startingDay || i > startingDay + monthLength) {
+            monthHtml += "<td>&nbsp;</td>";
+        } else {
+            var date = year + "-" + padNumber(month + 1) + "-" + padNumber(day);
+            monthHtml += "<td><button onclick='selectDate(\"" + date + "\")'>" + day + "</button></td>";
+            day++;
+        }
+
+        if (i % 7 == 0 && day <= monthLength) {
+            monthHtml += "</tr><tr>";
+        }
+    }
+
+    monthHtml += "</tr></table>";
+
+    document.querySelector(".calendar .eventCalendar").innerHTML = monthHtml
+}
+function isLeapYear(year) {
+    return (year % 4 == 0 && year % 100 != 0) || year % 400 == 0;
+}
+function padNumber(number) {
+    return ("0" + number).slice(-2);
+}
+
 function getEvents(){
     fetch(`./server/team.php/getEvents?teamID=${currentTeamID}`)
         .then((response) => {
@@ -351,22 +403,43 @@ function getEvents(){
         });
 }
 
+function filterEventList(elem){
+    document.querySelector(".eventListNav .active").classList.remove("active");
+    elem.classList.add("active");
+    getEvents();
+}
+
 function renderEventList(data){
     let html = "";
+    let filterType = document.querySelector(".eventListNav .active").innerHTML
 
     Object.values(data).forEach(item => {
-        html += `
-            <div class="eventBox">
+        let isCurrentItemIsTrue = false;
+        let date = new Date(item.date);
+
+        if(filterType === "Upcoming" && date.getTime() >= Date.now()){
+            isCurrentItemIsTrue = true;
+        }else if(filterType === "Today" && isToday(date)){
+            isCurrentItemIsTrue = true;
+        } else if(filterType === "All"){
+            isCurrentItemIsTrue = true;
+        }
+
+        if(isCurrentItemIsTrue){
+            html += renderEvent(item);
+        }
+    });
+    document.querySelector(".board section.calendar .eventList").innerHTML = html
+}
+
+function renderEvent(item){
+    return `<div class="eventBox">
                 ${getEventIcon(item.type)}
                 <div>
                     <h4>${item.description ? item.description : item.type}</h4>
                     <p>${getDayByDate(item.date)}, ${item.date} - ${item.time} Uhr</p>
                 </div>
-            </div>
-        `
-    });
-
-    document.querySelector(".board section.calendar .eventList").innerHTML = html
+            </div>`
 }
 
 function getEventIcon(eventType){
@@ -378,7 +451,6 @@ function getEventIcon(eventType){
 }
 
 function toggleNewEventField(){
-    console.log("test")
     if(!document.querySelector(".newEventList")){
         document.querySelector(".eventList").innerHTML += `
         <div class="eventBox newEventList">
@@ -416,8 +488,12 @@ function addEvent(){
     let date = document.querySelector("#dateInput").value;
     let time = document.querySelector("#timeInput").value;
     let duration = document.querySelector("#durationInput").value;
+    const zeroPad = (num, places) => String(num).padStart(places, '0')
 
-    if(type !== "" && date !== "" && time !== "" && duration !== ""){
+    if(type !== ""){
+        date = date ? date : `${new Date().getFullYear()}-${zeroPad(new Date().getMonth()+1, 2)}-${zeroPad(new Date().getDate(), 2)}`;
+        time = time ? time : `${zeroPad(new Date().getHours(), 2)}:${zeroPad(new Date().getMinutes(), 2)}`
+
         const data = {teamID: currentTeamID, type: type, description: description, date: date, time: time, duration: duration};
         fetch("./server/team.php/addEvent", {
             method: "POST", // or 'PUT'
@@ -454,11 +530,38 @@ function getDayByDate(dateStr){
     let dayOfWeek = daysOfWeek[date.getDay()];
     return dayOfWeek;
 }
+
+function isToday (date) {
+    const now = new Date()
+
+    return date.getDate() === now.getDate() &&
+        date.getMonth() === now.getMonth() &&
+        date.getFullYear() === now.getFullYear()
+}
 //endregion
 
 
 /********* settings *********/
 //region
+startEventListener()
+function startEventListener(){
+    document.querySelectorAll(".userSettings .personal input").forEach((item) => {
+        item.addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                updatePersonalData();
+            }
+        });
+    })
+
+    document.querySelectorAll(".userSettings .security input").forEach((item) => {
+        item.addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                updatePassword();
+            }
+        });
+    })
+}
+
 function toggleUserSettings(){
     document.querySelector(".userSettings").classList.toggle("active")
     document.querySelector(".board .sections").classList.toggle("active")
@@ -501,24 +604,33 @@ function updatePersonalData(){
         }
     }
 
-    fetch("./server/user.php/updatePersonalData", {
-        method: "POST", // or 'PUT'
-        headers: {
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify(personalData),
-    })
-        .then((response) => {
-            return response.json()
+    let errorField = document.querySelector(".error.personal")
+    errorField.innerHTML = "";
+    if(personalData.firstname === "" || personalData.lastname === "" || personalData.email === ""){
+        errorField.innerHTML = "Firstname, Lastname and Email has to be filled"
+    } else if(!/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/.test(personalData.email)){
+        errorField.innerHTML = "Invalid email address"
+    } else{
+        fetch("./server/user.php/updatePersonalData", {
+            method: "POST", // or 'PUT'
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(personalData),
         })
-        .then((data) => {
-            document.querySelector(".success.personal").innerHTML = "Persönliche Daten wurden erfolgreich geändert"
-            clearSuccessErrorAfterPeriod(3);
-        })
-        .catch((error) => {
-            document.querySelector(".error.personal").innerHTML = "Es gab einen Fehler beim Speichern der Daten"
-            console.error(`Error:`, error);
-        });
+            .then((response) => {
+                return response.json()
+            })
+            .then((data) => {
+                document.querySelector(".success.personal").innerHTML = "Persönliche Daten wurden erfolgreich geändert"
+                clearSuccessErrorAfterPeriod(3);
+                document.querySelector(".userName").innerHTML = personalData.firstname + " " + personalData.lastname;
+            })
+            .catch((error) => {
+                document.querySelector(".error.personal").innerHTML = "Es gab einen Fehler beim Speichern der Daten"
+                console.error(`Error:`, error);
+            });
+    }
 }
 
 async function checkPassword(password){

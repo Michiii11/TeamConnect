@@ -108,7 +108,7 @@ class TeamRepository
     }
 
     function getEvents($id){
-        $sql = "select id, teamID, type, description, DATE_FORMAT(date, '%d.%m.%Y') as 'date', time from event
+        $sql = "select id, teamID, type, description, date, time from event
                 where teamID like '{$id}';";
         try {
             $result = $this->connection->query($sql);
