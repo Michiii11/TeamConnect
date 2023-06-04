@@ -20,13 +20,17 @@ else
 
 if (isset($_SESSION["loggedIn"]) && $_SESSION["loggedIn"]) {
     switch($type){
-        case "getAllTeams": $response->data = $teams->getAllTeams(); break;
+        case "getAllTeamsNotEnteredYet": $response->data = $teams->getAllTeamsNotEnteredYet(); break;
         case "getTeams": $response->data = $teams->getTeams($_SESSION["userID"]); break;
         case "getTeamRequests": $response->data = $teams->getTeamRequests(); break;
         case "createTeam": $response->data = $teams->createTeam($_SESSION["userID"], $postBody->teamName); break;
         case "requestTeam": $response->data = $teams->requestTeam($_SESSION["userID"], $postBody->teamName); break;
+        case "agreeRequest": $response->data = $teams->agreeRequest($postBody->requestID, $postBody->playerID, $postBody->teamID); break;
+        case "denyRequest": $response->data = $teams->denyRequest($postBody->requestID); break;
         case "getEvents": $response->data = $teams->getEvents($_GET["teamID"]); break;
         case "addEvent": $response->data = $teams->addEvent($postBody->teamID, $postBody->type, $postBody->description, $postBody->date, $postBody->time, $postBody->duration); break;
+        case "changeTeamName": $teams->changeTeamName($postBody->oldTeamName, $postBody->newTeamName);break;
+        case "quitTeam": $teams->quitTeam($_SESSION["userID"], $postBody->teamName);
     }
 } else {
     $response->message = "Not Logged in!";

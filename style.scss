@@ -34,6 +34,7 @@ img{
 body{
   background-color: $gray-100;
   color: $color-contrast;
+  overflow: hidden;
 }
 
 html{
@@ -42,7 +43,7 @@ html{
 
 main{
   display: flex;
-  height: 90vh;
+  height: 100vh;
   position: relative;
 }
 
@@ -160,14 +161,14 @@ nav.login{
 
 //endregion
 
-/*---------- aside ----------*/
+/*---------- sidebar ----------*/
 //region aside
 
 main aside.sidebar{
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
-  z-index: 2;
+  z-index: 5;
   width: 200px;
   background-color: $gray-200;
   height: 95vh;
@@ -280,10 +281,80 @@ main aside.sidebar section.buttons{
       padding-right: .5rem;
     }
   }
+}
+//endregion
 
+/*---------- notification ----------*/
+//region notification
+main aside.notification{
+  display: none;
+  position: absolute;
+  flex-direction: column;
+  box-sizing: border-box;
+  width: 300px;
+  height: 40vh;
+  background-color: $gray-200;
+  padding: .5rem 1rem;
+  box-shadow: 2px 2px 2px 2px $gray-300;
+  border-top-right-radius: .5rem;
+  border-bottom-right-radius: .5rem;
+
+  bottom: 0;
+  left: 180px;
+  z-index: 4;
+
+  overflow: auto;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar{
+    display: none;
+  }
+
+  &.active{
+    display: flex;
+  }
+
+  h1{
+    text-align: center;
+    padding-bottom: .25rem;
+    margin-bottom: .25rem;
+    border-bottom: 1px solid $gray-600;
+  }
 }
 
-//endregion
+main aside.notification div.newNotification{
+  display: grid;
+  grid-template-columns: .1fr 1fr;
+  margin-block: .25rem;
+  padding-block: .25rem;
+  border-bottom: 1px solid $gray-500;
+  grid-column-gap: .8rem;
+
+
+  &.request{
+    grid-template-columns: .1fr 1fr .1fr;
+    div{
+      display: flex;
+      flex-direction: column;
+      justify-content: space-around;
+    }
+
+    i{
+      font-size: 1.2rem;
+      cursor: pointer;
+    }
+  }
+
+  &:hover{
+
+  }
+  img{
+    grid-row-start: 1;
+    grid-row-end: span 2;
+    width: 2rem;
+  }
+}
 
 /*---------- Login ----------*/
 //region login
@@ -534,33 +605,49 @@ main.login{
   }
 
   &.teams{
-    overflow: auto;
-    div{
-      display: flex;
-
-      img{
-        width: 2rem;
-      }
-    }
-
-    h3, .section{
-      padding-block: .5rem;
-      margin-left: 4rem;
-    }
-    i{
-      font-size: 1rem;
-    }
-
     .section{
       border: none;
       display: grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: repeat(2, 1fr);
+
+      overflow: auto;
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+      &::-webkit-scrollbar{
+        display: none;
+      }
 
       div{
         padding: 1rem .5rem;
         border: 1px solid $color-contrast;
         border-radius: 1rem;
         margin: .5rem 2rem;
+
+        display: flex;
+        align-items: center;
+
+        img{
+          margin-right: 1rem;
+          width: 2rem;
+        }
+      }
+    }
+
+    p{
+      font-size: 1.2rem;
+    }
+    h3, .section{
+      padding-block: .5rem;
+      margin-left: 4rem;
+    }
+    .section div.edit{
+      padding: 0;
+      border: none;
+      margin: 0;
+      margin-left: auto;
+
+      i{
+        font-size: 1.2rem;
       }
     }
   }
@@ -601,9 +688,14 @@ main.login{
   display: flex;
   flex-direction: column-reverse;
   height: 80vh;
+  margin-top: auto;
+
   overflow: auto;
   -ms-overflow-style: none;
-  margin-top: auto;
+  scrollbar-width: none;
+  &::-webkit-scrollbar{
+    display: none;
+  }
 }
 .board .sections section.chat .messageBox {
   display: flex;
@@ -671,8 +763,15 @@ main.login{
   display: flex;
   flex-direction: column;
 
+  .fullView{
+    padding: 1rem;
+    text-align: center;
+  }
+
   .playerBox{
     display: flex;
+    cursor: pointer;
+    user-select: none;
     align-items: center;
     justify-content: left;
     margin: 1rem;
@@ -680,19 +779,38 @@ main.login{
     border: 1px solid $gray-500;
     box-shadow: .1rem .1rem .2rem $gray-500;
     border-radius: 1rem;
+
     overflow: auto;
     -ms-overflow-style: none;
-
-    i:first-child{
-      margin-right: 1rem;
-      font-size: 3rem;
+    scrollbar-width: none;
+    &::-webkit-scrollbar{
+      display: none;
     }
-    i:last-child{
+
+    img{
+      margin-right: 1rem;
+      width: 4rem;
+    }
+    i{
       margin-left: auto;
-      cursor: pointer;
       font-size: 1.2rem;
       padding: .5rem;
       border-radius: 50%;
+    }
+  }
+
+  .userIconName{
+    display: flex;
+    align-items: center;
+    margin-bottom: 1rem;
+  }
+  .detail{
+    display: grid;
+
+    div.stats{
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-gap: 1rem;
     }
   }
 }
@@ -709,6 +827,7 @@ main.login{
   display: grid;
   width: 100%;
   height: 50%;
+  text-align: center;
   background-color: $gray-300;
 }
 
@@ -742,9 +861,11 @@ main.login{
   align-items: center;
   width: 100%;
   height: 30vh;
+
   overflow: auto;
   -ms-overflow-style: none;
-  &::-webkit-scrollbar {
+  scrollbar-width: none;
+  &::-webkit-scrollbar{
     display: none;
   }
 
@@ -841,9 +962,13 @@ main.login{
       border-bottom-left-radius: .5rem;
       border-bottom-right-radius: .5rem;
       border-top: none;
+
       overflow: auto;
       -ms-overflow-style: none;
       scrollbar-width: none;
+      &::-webkit-scrollbar{
+        display: none;
+      }
 
       p{
         padding-block: .1rem;
@@ -852,9 +977,6 @@ main.login{
         &:hover{
           color: adjust-color($color-contrast, $lightness: -30%);
         }
-      }
-      &::-webkit-scrollbar{
-        display: none;
       }
     }
   }

@@ -15,6 +15,7 @@ img {
 body {
   background-color: hsl(0, 0%, 5%);
   color: hsl(0, 0%, 90%);
+  overflow: hidden;
 }
 
 html {
@@ -23,7 +24,7 @@ html {
 
 main {
   display: flex;
-  height: 90vh;
+  height: 100vh;
   position: relative;
 }
 
@@ -125,12 +126,12 @@ nav.login {
   z-index: 2;
 }
 
-/*---------- aside ----------*/
+/*---------- sidebar ----------*/
 main aside.sidebar {
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
-  z-index: 2;
+  z-index: 5;
   width: 200px;
   background-color: hsl(0, 0%, 10%);
   height: 95vh;
@@ -233,6 +234,65 @@ main aside.sidebar section.buttons div:hover {
 }
 main aside.sidebar section.buttons div i {
   padding-right: 0.5rem;
+}
+
+/*---------- notification ----------*/
+main aside.notification {
+  display: none;
+  position: absolute;
+  flex-direction: column;
+  box-sizing: border-box;
+  width: 300px;
+  height: 40vh;
+  background-color: hsl(0, 0%, 10%);
+  padding: 0.5rem 1rem;
+  box-shadow: 2px 2px 2px 2px hsl(0, 0%, 15%);
+  border-top-right-radius: 0.5rem;
+  border-bottom-right-radius: 0.5rem;
+  bottom: 0;
+  left: 180px;
+  z-index: 4;
+  overflow: auto;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+main aside.notification::-webkit-scrollbar {
+  display: none;
+}
+main aside.notification.active {
+  display: flex;
+}
+main aside.notification h1 {
+  text-align: center;
+  padding-bottom: 0.25rem;
+  margin-bottom: 0.25rem;
+  border-bottom: 1px solid hsl(0, 0%, 30%);
+}
+
+main aside.notification div.newNotification {
+  display: grid;
+  grid-template-columns: 0.1fr 1fr;
+  margin-block: 0.25rem;
+  padding-block: 0.25rem;
+  border-bottom: 1px solid hsl(0, 0%, 25%);
+  grid-column-gap: 0.8rem;
+}
+main aside.notification div.newNotification.request {
+  grid-template-columns: 0.1fr 1fr 0.1fr;
+}
+main aside.notification div.newNotification.request div {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+}
+main aside.notification div.newNotification.request i {
+  font-size: 1.2rem;
+  cursor: pointer;
+}
+main aside.notification div.newNotification img {
+  grid-row-start: 1;
+  grid-row-end: span 2;
+  width: 2rem;
 }
 
 /*---------- Login ----------*/
@@ -435,32 +495,44 @@ main.login .backgroundImage {
   margin-top: 1rem;
   margin-left: 2rem;
 }
-.userSettings section.teams {
-  overflow: auto;
-}
-.userSettings section.teams div {
-  display: flex;
-}
-.userSettings section.teams div img {
-  width: 2rem;
-}
-.userSettings section.teams h3, .userSettings section.teams .section {
-  padding-block: 0.5rem;
-  margin-left: 4rem;
-}
-.userSettings section.teams i {
-  font-size: 1rem;
-}
 .userSettings section.teams .section {
   border: none;
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(2, 1fr);
+  overflow: auto;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.userSettings section.teams .section::-webkit-scrollbar {
+  display: none;
 }
 .userSettings section.teams .section div {
   padding: 1rem 0.5rem;
   border: 1px solid hsl(0, 0%, 90%);
   border-radius: 1rem;
   margin: 0.5rem 2rem;
+  display: flex;
+  align-items: center;
+}
+.userSettings section.teams .section div img {
+  margin-right: 1rem;
+  width: 2rem;
+}
+.userSettings section.teams p {
+  font-size: 1.2rem;
+}
+.userSettings section.teams h3, .userSettings section.teams .section {
+  padding-block: 0.5rem;
+  margin-left: 4rem;
+}
+.userSettings section.teams .section div.edit {
+  padding: 0;
+  border: none;
+  margin: 0;
+  margin-left: auto;
+}
+.userSettings section.teams .section div.edit i {
+  font-size: 1.2rem;
 }
 
 /*---------- Board ----------*/
@@ -492,9 +564,13 @@ main.login .backgroundImage {
   display: flex;
   flex-direction: column-reverse;
   height: 80vh;
+  margin-top: auto;
   overflow: auto;
   -ms-overflow-style: none;
-  margin-top: auto;
+  scrollbar-width: none;
+}
+.board .sections section.chat .chatBox::-webkit-scrollbar {
+  display: none;
 }
 
 .board .sections section.chat .messageBox {
@@ -555,8 +631,14 @@ main.login .backgroundImage {
   display: flex;
   flex-direction: column;
 }
+.board section.player .fullView {
+  padding: 1rem;
+  text-align: center;
+}
 .board section.player .playerBox {
   display: flex;
+  cursor: pointer;
+  user-select: none;
   align-items: center;
   justify-content: left;
   margin: 1rem;
@@ -566,17 +648,33 @@ main.login .backgroundImage {
   border-radius: 1rem;
   overflow: auto;
   -ms-overflow-style: none;
+  scrollbar-width: none;
 }
-.board section.player .playerBox i:first-child {
+.board section.player .playerBox::-webkit-scrollbar {
+  display: none;
+}
+.board section.player .playerBox img {
   margin-right: 1rem;
-  font-size: 3rem;
+  width: 4rem;
 }
-.board section.player .playerBox i:last-child {
+.board section.player .playerBox i {
   margin-left: auto;
-  cursor: pointer;
   font-size: 1.2rem;
   padding: 0.5rem;
   border-radius: 50%;
+}
+.board section.player .userIconName {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+.board section.player .detail {
+  display: grid;
+}
+.board section.player .detail div.stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-gap: 1rem;
 }
 
 /*---------- CalendarBox ----------*/
@@ -589,6 +687,7 @@ main.login .backgroundImage {
   display: grid;
   width: 100%;
   height: 50%;
+  text-align: center;
   background-color: hsl(0, 0%, 15%);
 }
 
@@ -623,6 +722,7 @@ main.login .backgroundImage {
   height: 30vh;
   overflow: auto;
   -ms-overflow-style: none;
+  scrollbar-width: none;
 }
 .board section.calendar .eventList::-webkit-scrollbar {
   display: none;
@@ -711,15 +811,15 @@ main.login .backgroundImage {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
+.popUp.active .content > div .teamList div::-webkit-scrollbar {
+  display: none;
+}
 .popUp.active .content > div .teamList div p {
   padding-block: 0.1rem;
   cursor: pointer;
 }
 .popUp.active .content > div .teamList div p:hover {
   color: #999999;
-}
-.popUp.active .content > div .teamList div::-webkit-scrollbar {
-  display: none;
 }
 .popUp.active .content > div input {
   padding: 0.5rem;

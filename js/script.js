@@ -3,12 +3,25 @@ let personalData
 
 let currentTeamName
 let currentTeamID
+let isCurrentTeamMyTeam
+let amountOfTeams
 
 function updateDashboard(){
-    getPlayers();
-    getEvents();
-    getTeamRequests();
-    loadCalendarGrid();
+    if(amountOfTeams !== 0){
+        getPlayers();
+        getEvents();
+        getTeamRequests();
+        loadCalendarGrid();
+    } else{
+        //todo area for new customers to set up a team
+    }
+}
+
+function updateTeams(){
+    getMyTeams();
+    updateTeamList();
+    loadTeamList();
+    document.querySelector(".teamName").innerHTML = currentTeamName
 }
 
 /********* check login *********/
@@ -32,6 +45,7 @@ function checkLogin(){
                 personalData = answer.personalData;
 
                 document.querySelector(".userName").innerHTML = personalData.firstname + " " + personalData.lastname;
+                updateDashboard()
             }
         })
         .catch((error) => {
@@ -68,9 +82,9 @@ function addNavitemEventListener(){
 //endregion
 
 
-/********* asside *********/
+/********* aside *********/
 //region
-getMyTeams()
+updateTeams();
 
 /**
  * gets the teams where the user is in
@@ -81,6 +95,7 @@ function getMyTeams(){
             return response.json()
         })
         .then(answer=>{
+            amountOfTeams = answer.data.length;
             renderAside(answer.data)
         })
         .catch((error) => {
@@ -96,6 +111,10 @@ function renderAside(data){
         if(i++ === 0){
             html += `<p class="active" onclick="selectTeam(this, ${item.id})">${item.name}`;
             currentTeamID = item.id
+            currentTeamName = item.name
+            document.querySelector(".teamName").innerHTML = currentTeamName
+
+            isCurrentTeamMyTeam = item.captain === item.playerID
         } else{
             html += `<p onclick="selectTeam(this, ${item.id})">${item.name}`;
         }
@@ -125,6 +144,8 @@ function selectTeam(elem, id){
 
     currentTeamID = id;
     currentTeamName = elem.textContent;
+    isCurrentTeamMyTeam = !!elem.querySelector("i")
+
     updateDashboard()
     document.querySelector("nav .teamName").innerHTML = currentTeamName;
 }
@@ -137,7 +158,7 @@ function togglePopUp(){
     document.querySelector(".popUp.addTeam").classList.toggle("active");
     if(!document.querySelector(".popUp.addTeam.active")){
         document.querySelector(".error.create").innerHTML = ""
-        loadTeamList()
+        updateTeams()
     }
     document.querySelector(".popUp.addTeam .active input").focus();
 }
@@ -151,7 +172,7 @@ function toggleTeamCreate(){
 
 let teams = {}
 function loadTeamList(){
-    fetch(`./server/team.php/getAllTeams`)
+    fetch(`./server/team.php/getAllTeamsNotEnteredYet`)
         .then((response) => {
             return response.json()
         })
@@ -234,13 +255,16 @@ function requestTeam() {
             return response.json()
         })
         .then((data) => {
-            console.log(data)
-
-            loadTeamList();
+            updateTeams();
+            sendedTeamRequest();
         })
         .catch((error) => {
             console.error(`Error:`, error);
         });
+}
+
+function sendedTeamRequest(){
+    document.querySelector("#findTeamInput").value = ""
 }
 
 /**
@@ -252,7 +276,6 @@ function getTeamRequests() {
            return response.json()
         })
         .then(answer=>{
-            console.log(answer)
         })
         .catch((error) => {
             console.error("Error:", error);
@@ -282,9 +305,7 @@ function createTeam() {
                 return response.json()
             })
             .then((data) => {
-                console.log(data)
-
-                getMyTeams()
+                updateTeams();
                 togglePopUp();
             })
             .catch((error) => {
@@ -301,16 +322,18 @@ function createTeam() {
 /********* player box *********/
 //region
 function getPlayers(){
-    fetch(`./server/user.php/getPlayer?teamID=${currentTeamID}`)
-        .then((response) => {
-            return response.json()
-        })
-        .then(answer=>{
-            renderPlayers(answer.data)
-        })
-        .catch((error) => {
-            console.error("Error:", error);
-        });
+    if(currentTeamID){
+        fetch(`./server/user.php/getPlayer?teamID=${currentTeamID}`)
+            .then((response) => {
+                return response.json()
+            })
+            .then(answer=>{
+                renderPlayers(answer.data)
+            })
+            .catch((error) => {
+                console.error("Error:", error);
+            });
+    }
 }
 
 function renderPlayers(data){
@@ -318,21 +341,64 @@ function renderPlayers(data){
 
     Object.values(data).forEach(item => {
         html += `
-            <div class="playerBox">
-                <i class="fa-solid fa-circle-user"></i>
+            <div onclick="toggleDetail(this, '${item.id}')" class="playerBox">
+                <img src="img/userIcon.png" alt="userIcon">
                 <div class="playerStats">
                     <h2>${item.firstname} ${item.lastname}</h2>
-                    <p>RM - GESUND - STAMMSPIELER</p>
+                    <p>${item.position} - ${item.health.toUpperCase()} - STAMMSPIELER</p>
                 </div>
-                <i onclick="editPlayer(${item.id})" class="fa-sharp fa-solid fa-pen"></i>
+                <i class="fa-solid fa-eye"></i>
             </div>`
     });
 
     document.querySelector(".board section.player").innerHTML = html
 }
 
-function editPlayer(item){
-    console.log(item)
+function toggleDetail(elem, playerID){
+    elem.classList.toggle("detail")
+
+    let data = {playerID: playerID, teamID: currentTeamID}
+    fetch("./server/user.php/getPlayerDetails", {
+        method: "POST", // or 'PUT'
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+    })
+        .then((response) => {
+            return response.json()
+        })
+        .then((answer) => {
+            let person = answer.data
+            console.log(person)
+
+            if(elem.classList.contains("detail")){
+                let goalPerGame = person.goals / person.games;
+                let assistPerGame = person.assists / person.games;
+                let scorerPerGame = person.scorer / person.games;
+
+                elem.innerHTML = `<div class="userIconName"><img src="img/userIcon.png" alt="userIcon"><h1>${person.firstname} ${person.lastname}</h1></div>
+                <div class="stats">
+                    <div><p>Größe: ${person.height}</p><p>Gewicht: ${person.weight}</p></div>
+                    <div><p>Position: ${person.position}</p><p>Status: ${person.health}</p></div>
+                    <div><p>Tore: ${person.goals}</p><p>Vorlage: ${person.assists}</p><p>Scorer: ${person.scorer}</p></div>
+                    <div><p>Tor/Spiel: ${goalPerGame}</p><p>Vorlage/Spiel: ${assistPerGame}</p><p>Scorer/Spiel: ${scorerPerGame}</p></div>
+                    <div><p>Gelbe Karten: ${person.yellow}</p><p>Rote Karten: ${person.red}</p></div>
+                    <div><p>Spiele: ${person.games}</p><p>Trainings: ${person.trainings}</p></div>
+                </div>`
+            } else{
+                elem.innerHTML = `<img src="img/userIcon.png" alt="userIcon">
+                        <div class="playerStats">
+                            <h2>${person.firstname} ${person.lastname}</h2>
+                            <p>${person.position} - ${person.health.toUpperCase()} - STAMMSPIELER</p>
+                        </div>
+                        <i class="fa-solid fa-eye"></i>`
+            }
+        })
+        .catch((error) => {
+            document.querySelector(".error.create").innerHTML = `Team Name ist bereits benutzt`
+            console.error(`Error:`, error);
+        });
 }
 //endregion
 
@@ -412,8 +478,17 @@ function filterEventList(elem){
 function renderEventList(data){
     let html = "";
     let filterType = document.querySelector(".eventListNav .active").innerHTML
+    let dataArray = []
 
-    Object.values(data).forEach(item => {
+    for (const curr in data) {
+        dataArray.push(data[curr]);
+    }
+    dataArray.sort(function(a,b){
+        return new Date(a.date) - new Date(b.date);
+    });
+
+
+    Object.values(dataArray).forEach(item => {
         let isCurrentItemIsTrue = false;
         let date = new Date(item.date);
 
@@ -541,6 +616,80 @@ function isToday (date) {
 //endregion
 
 
+/********* notification *********/
+//region
+function toggleNotification(){
+    document.querySelector("main aside.notification").classList.toggle("active");
+    updateNotifications()
+}
+
+function updateNotifications(){
+    document.querySelector("aside.notification").innerHTML = "<h1>Nachrichten</h1>"
+    fetch("./server/team.php/getTeamRequests")
+        .then((response) => {
+            return response.json()
+        })
+        .then((data) => {
+            for (const dataKey in data.data) {
+                let curr = data.data[dataKey]
+                document.querySelector("aside.notification").innerHTML +=
+                    `<div class="newNotification request r${curr.id}">
+                    <img src="img/userIcon.png" alt="userIcon">
+                    <p>${curr.firstname} ${curr.lastname} will deinem Team "${curr.teamName}" beitreten.</p>
+                    <div><i onclick="agreeRequest('${curr.id}', '${curr.playerID}', '${curr.teamID}')" class="fa-solid fa-check"></i><i onclick="denyRequest('${curr.id}')" class="fa-solid fa-x"></i></div>
+                </div>`
+            }
+        })
+        .catch((error) => {
+            console.error(`Error:`, error);
+        });
+}
+
+function agreeRequest(requestID, playerID, teamID){
+    let data = {requestID: requestID, playerID: playerID, teamID: teamID}
+
+    fetch("./server/team.php/agreeRequest", {
+        method: "POST", // or 'PUT'
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+    })
+        .then((response) => {
+            return response.json()
+        })
+        .then((data) => {
+            updateNotifications();
+            updateTeams();
+        })
+        .catch((error) => {
+            console.error(`Error:`, error);
+        });
+}
+function denyRequest(requestID){
+    let data = {requestID: requestID}
+
+    fetch("./server/team.php/denyRequest", {
+        method: "POST", // or 'PUT'
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+    })
+        .then((response) => {
+            return response.json()
+        })
+        .then((data) => {
+            updateNotifications()
+        })
+        .catch((error) => {
+            console.error(`Error:`, error);
+        });
+}
+
+//endregion
+
+
 /********* settings *********/
 //region
 startEventListener()
@@ -566,27 +715,7 @@ function toggleUserSettings(){
     document.querySelector(".userSettings").classList.toggle("active")
     document.querySelector(".board .sections").classList.toggle("active")
     updatePersonalDataInputs();
-
-    fetch(`./server/team.php/getTeams`)
-        .then((response) => {
-            return response.json()
-        })
-        .then(answer=>{
-            let html = "";
-            Object.values(answer.data).forEach(item => {
-                html += `
-                    <div>
-                        <img src="img/userIcon.png" alt="userIcon">
-                        <p>${item.name}</p>
-                        <i class="fa-solid fa-pen"></i>
-                        <i class="fa-solid fa-trash"></i>
-                    </div>`
-            })
-            document.querySelector(".userSettings .teams .section").innerHTML = html;
-        })
-        .catch((error) => {
-            console.error("Error:", error);
-        });
+    updateTeams();
 }
 
 function updatePersonalDataInputs(){
@@ -704,6 +833,7 @@ function logout(){
     personalData = ""
     currentTeamName = ""
     currentTeamID = ""
+    isCurrentTeamMyTeam = false
 
     window.location.replace(document.location.href + "/login.html");
 }
@@ -720,4 +850,95 @@ function clearSuccessErrorAfterPeriod(time){
             value.innerHTML = "";
         })
     }, timeToDisappear)
+}
+
+function updateTeamList(){
+    fetch(`./server/team.php/getTeams`)
+        .then((response) => {
+            return response.json()
+        })
+        .then(answer=>{
+            let html = "";
+            Object.values(answer.data).forEach(item => {
+                html += `
+                    <div class='.teams T${item.name.replaceAll(' ', "")}'>
+                        <img src="img/userIcon.png" alt="userIcon">
+                        <p>${item.name}</p>
+                        <div class="edit">
+                            <i class="fa-solid fa-pen" onclick="changeTeamViewToEdit('${item.name}')"></i>
+                            <i class="fa-solid fa-trash" onclick="quitOrDeleteTeamInfo('${item.name}')"></i>
+                        </div>
+                    </div>`
+            })
+            document.querySelector(".userSettings .teams .section").innerHTML = html;
+        })
+        .catch((error) => {
+            console.error("Error:", error);
+        });
+}
+
+function changeTeamViewToEdit(teamName){
+    let teamBox = document.querySelector(`.teams .T${teamName.replaceAll(' ', "")} p`)
+    let icon = document.querySelectorAll(`.teams .T${teamName.replaceAll(' ', "")} i.fa-solid`)[0]
+    icon.classList.toggle("fa-pen")
+    icon.classList.toggle("fa-floppy-disk")
+
+    if(teamBox.querySelector("input")){
+        changeTeamName(teamName, teamBox.querySelector("input").value);
+    } else{
+        teamBox.innerHTML = `<input type="text" value="${teamName}"/>`
+    }
+}
+function changeTeamName(oldTeamName, newTeamName){
+    let teamBox = document.querySelector(`.teams .T${oldTeamName.replaceAll(' ', "")} p`)
+
+    const data = {oldTeamName: oldTeamName, newTeamName: newTeamName};
+    fetch("./server/team.php/changeTeamName", {
+        method: "POST", // or 'PUT'
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+    })
+        .then((response) => {
+            return response.json()
+        })
+        .then((data) => {
+            teamBox.innerHTML = newTeamName
+            teamBox.classList.remove(`T${oldTeamName.replaceAll(' ', "")}`)
+            teamBox.classList.add(`T${newTeamName.replaceAll(' ', "")}`)
+        })
+        .catch((error) => {
+            console.error(`Error:`, error);
+        });
+}
+
+let savedHTML = ""
+function quitOrDeleteTeamInfo(teamName){
+    let teamBox = document.querySelector(`.teams .T${teamName.replaceAll(' ', "")}`)
+    if(savedHTML === ""){
+        savedHTML = teamBox.innerHTML
+        teamBox.innerHTML = `<p>Möchtest du ${teamName} wirklich verlassen</p>
+            <button class="filled" onclick="quitOrDeleteTeamInfo('${teamName}')">Nein</button>
+            <button class="outlined" onclick="deleteTeam('${teamName}')">Ja</button>`
+    } else{
+        teamBox.innerHTML = savedHTML
+        savedHTML = ""
+    }
+}
+function deleteTeam(teamName){
+    const data = {teamName: teamName};
+    fetch("./server/team.php/quitTeam", {
+        method: "POST", // or 'PUT'
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+    })
+        .then((response) => {
+            updateTeams();
+        })
+        .catch((error) => {
+            console.error(`Error:`, error);
+        });
 }

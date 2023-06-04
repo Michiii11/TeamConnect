@@ -162,6 +162,28 @@ class UserRepository
         }
     }
 
+    function getPlayerDetails($playerID, $teamID){//todo stats are for all teams summed, you should do it for teams separate
+        $sql = "select u.id as id, firstname, lastname, height, weight, position, health,
+                nvl(sum(goal), 0) as goals, nvl(sum(assist), 0) as assists, nvl(sum(goal+assist), 0) as scorer, nvl(sum(yellowCard), 0) as yellow, nvl(sum(redCard), 0) as red,
+                (select count(e.id) from event e join user_event ue2 on e.id = ue2.eventID where ue2.playerID = u.id and e.type like 'Spiel') as games,
+                (select count(e.id) from event e join user_event ue2 on e.id = ue2.eventID where ue2.playerID = u.id and e.type not like 'Spiel') as trainings from user u
+                left outer join user_event ue on ue.playerID = u.id
+                left outer join event e on ue.eventID = e.id
+                group by u.id
+                having u.id like '$playerID'";
+        try {
+            $result = $this->connection->query($sql);
+            if ($result->num_rows == 0) {
+                return false;
+            } else {
+                $row = $result->fetch_assoc();
+                return $row;
+            }
+        } catch (mysqli_sql_exception $err) {
+            throw new Exception("SQL error occurred: " . $err->getMessage());
+        }
+    }
+
     //getters & setters
     function getConnection()
     {
