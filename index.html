@@ -5,6 +5,7 @@
     <title>Dashboard</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="./style.css">
+    <link rel="stylesheet" href="./checkbox.css">
     <script src='js/script.js' defer></script>
     <script src="js/popupEngine.js"></script>
     <script src="https://kit.fontawesome.com/557f0c19d3.js" crossorigin="anonymous"></script>
@@ -204,7 +205,36 @@
             <section class="player"></section>
 
             <section class="calendar">
-                <div class="eventCalendar"></div>
+                <div class="eventFull">
+                    <div class="header">
+                        <i class="fa-solid fa-arrow-left"></i>
+                        <div>
+                            <h2>Fußballtraining</h2>
+                            <p>Samstag, 15.06.2023 - 21:12 Uhr</p>
+                        </div>
+                    </div>
+
+                    <div class="description">
+                        <p>von 20:15 bis 22:15</p>
+                        <Label for="descriptionField">Beschreibung:</Label><input type="text" id="descriptionField"><br>
+                        <Label for="notizField">Notizen:</Label><textarea id="notizField"></textarea>
+                    </div>
+
+                    <div class="playerSelect">
+                        <label class="container" id="selectPlayer">Spieler auswählen
+                            <input type="checkbox">
+                            <span class="checkmark"></span>
+                        </label>
+                        <div class="playerList">
+                            <label class="container">Spieler auswählen
+                                <input type="checkbox">
+                                <span class="checkmark"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!--<div class="eventCalendar"></div>
                 <div class="eventListNav">
                     <p class="active" onclick="filterEventList(this)">Upcoming</p>
                     <p onclick="filterEventList(this)">Today</p>
@@ -212,7 +242,7 @@
                 </div>
                 <div class="eventList"></div>
 
-                <button onclick="toggleNewEventField()" class="newButton"><i class="fa-solid fa-plus"></i>NEUER EINTRAG</button>
+                <button onclick="toggleNewEventField()" class="newButton"><i class="fa-solid fa-plus"></i>NEUER EINTRAG</button>-->
             </section>
         </div>
     </div>

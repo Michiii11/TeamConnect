@@ -508,7 +508,7 @@ function renderEventList(data){
 }
 
 function renderEvent(item){
-    return `<div class="eventBox">
+    return `<div class="eventBox" onclick="toggleEvent(${item.id})">
                 ${getEventIcon(item.type)}
                 <div>
                     <h4>${item.description ? item.description : item.type}</h4>
@@ -590,6 +590,14 @@ function addEvent(){
     }else{
         console.log("Error")
     }
+}
+
+function toggleEvent(id){
+
+}
+
+function editEvent(){
+
 }
 
 function getDayByDate(dateStr){

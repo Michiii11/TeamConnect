@@ -714,6 +714,56 @@ main.login .backgroundImage {
   font-weight: bold;
 }
 
+.board section.calendar .eventFull .header {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 1rem;
+  border-bottom: 1px solid hsl(0, 0%, 90%);
+}
+.board section.calendar .eventFull .header i {
+  font-size: 1.5rem;
+  cursor: pointer;
+  margin-right: auto;
+}
+.board section.calendar .eventFull .header div {
+  margin-right: auto;
+}
+.board section.calendar .eventFull .description {
+  padding: 1rem;
+  border-bottom: 1px solid hsl(0, 0%, 90%);
+}
+.board section.calendar .eventFull .description p, .board section.calendar .eventFull .description label {
+  padding: 0.5rem 1rem;
+  font-size: 1.2rem;
+}
+.board section.calendar .eventFull .description input, .board section.calendar .eventFull .description textarea {
+  font-size: 1.2rem;
+  margin: 0.5rem 1rem;
+  background-color: hsl(0, 0%, 20%);
+  color: hsl(0, 0%, 90%);
+  border: none;
+  border-bottom: 1px solid hsl(0, 0%, 90%);
+}
+.board section.calendar .eventFull .playerSelect {
+  padding: 1rem;
+  border-bottom: 1px solid hsl(0, 0%, 90%);
+}
+.board section.calendar .eventFull .playerSelect label#selectPlayer {
+  font-size: 1.5rem;
+}
+.board section.calendar .eventFull .playerSelect input {
+  accent-color: hsl(123, 43%, 39%);
+  color-scheme: dark;
+}
+.board section.calendar .eventFull .playerSelect div {
+  display: flex;
+  flex-direction: column;
+}
+.board section.calendar .eventFull .playerSelect div label, .board section.calendar .eventFull .playerSelect div input {
+  font-size: 1.2rem;
+}
+
 .board section.calendar .eventList {
   display: flex;
   flex-direction: column;

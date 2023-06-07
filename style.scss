@@ -855,6 +855,66 @@ main.login{
   }
 }
 
+.board section.calendar .eventFull{
+  .header{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 1rem;
+    border-bottom: 1px solid $color-contrast;
+
+    i{
+      font-size: 1.5rem;
+      cursor: pointer;
+      margin-right: auto;
+    }
+    div{
+      margin-right: auto;
+    }
+  }
+
+  .description{
+    padding: 1rem;
+    border-bottom: 1px solid $color-contrast;
+
+    p, label{
+      padding: .5rem 1rem;
+      font-size: 1.2rem;
+    }
+    input, textarea {
+      font-size: 1.2rem;
+      margin: .5rem 1rem;
+      background-color: $gray-400;
+      color: $color-contrast;
+      border: none;
+      border-bottom: 1px solid $color-contrast;
+    }
+  }
+
+  .playerSelect{
+    padding: 1rem;
+    border-bottom: 1px solid $color-contrast;
+
+    label#selectPlayer{
+      font-size: 1.5rem;
+    }
+
+    input{
+      accent-color: $primary-main;
+      color-scheme: dark;
+    }
+
+    div {
+      display: flex;
+      flex-direction: column;
+
+      label, input{
+        font-size: 1.2rem;
+      }
+    }
+  }
+}
+
 .board section.calendar .eventList{
   display: flex;
   flex-direction: column;

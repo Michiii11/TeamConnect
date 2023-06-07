@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 5.2.0
+-- version 5.2.1
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Erstellungszeit: 05. Jun 2023 um 16:43
--- Server-Version: 10.4.27-MariaDB
--- PHP-Version: 8.2.0
+-- Erstellungszeit: 07. Jun 2023 um 16:05
+-- Server-Version: 10.4.28-MariaDB
+-- PHP-Version: 8.2.4
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -35,23 +35,24 @@ CREATE TABLE `event` (
   `type` varchar(50) DEFAULT NULL,
   `description` varchar(100) NOT NULL,
   `duration` int(50) DEFAULT 1,
-  `result` varchar(100) DEFAULT NULL,
-  `note` varchar(300) DEFAULT NULL
+  `result` varchar(100) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Daten für Tabelle `event`
 --
 
-INSERT INTO `event` (`id`, `teamID`, `date`, `time`, `type`, `description`, `duration`, `result`, `note`) VALUES
-(17, 1, '2023-06-28', '14:51', 'Fußballtraining', '', 2, NULL, NULL),
-(18, 1, '2023-06-27', '13:12', 'Spiel', '', 2, NULL, NULL),
-(19, 1, '2023-06-23', '14:35', 'Konditionstraining', '', 2, NULL, NULL),
-(23, 1, '2023-06-02', '13:57', 'Fußballtraining', '', 0, NULL, NULL),
-(24, 71, '2023-06-02', '21:12', 'Fußballtraining', '', 0, NULL, NULL),
-(25, 71, '2023-06-15', '21:12', 'Fußballtraining', '', 0, NULL, NULL),
-(26, 71, '2023-05-29', '21:12', 'Fußballtraining', '', 0, NULL, NULL),
-(27, 71, '2023-06-14', '02:17', 'Spiel', '', 1, NULL, NULL);
+INSERT INTO `event` (`id`, `teamID`, `date`, `time`, `type`, `description`, `duration`, `result`) VALUES
+(17, 1, '2023-06-28', '14:51', 'Fußballtraining', '', 2, NULL),
+(18, 1, '2023-06-27', '13:12', 'Spiel', '', 2, NULL),
+(19, 1, '2023-06-23', '14:35', 'Konditionstraining', '', 2, NULL),
+(23, 1, '2023-06-02', '13:57', 'Fußballtraining', '', 0, NULL),
+(24, 71, '2023-06-02', '21:12', 'Fußballtraining', '', 0, NULL),
+(25, 71, '2023-06-15', '21:12', 'Fußballtraining', '', 0, NULL),
+(26, 71, '2023-05-29', '21:12', 'Fußballtraining', '', 0, NULL),
+(27, 71, '2023-06-14', '02:17', 'Spiel', '', 1, NULL),
+(28, 137, '0234-02-28', '13:41', 'Spiel', '', 0, NULL),
+(29, 137, '2023-06-29', '13:41', 'Fußballtraining', '', 214321, NULL);
 
 -- --------------------------------------------------------
 
@@ -74,7 +75,8 @@ INSERT INTO `team` (`id`, `playerID`, `name`) VALUES
 (72, 8, 'lukis team'),
 (86, 9, 'yaniks team'),
 (108, 8, 'nielis team'),
-(119, 10, 'nielis superteam');
+(119, 10, 'nielis superteam'),
+(137, 8, 'nein');
 
 -- --------------------------------------------------------
 
@@ -101,7 +103,7 @@ CREATE TABLE `user` (
 
 INSERT INTO `user` (`id`, `firstname`, `lastname`, `email`, `password`, `position`, `health`, `rule`, `height`, `weight`) VALUES
 (8, 'Michael', 'Leisch', 'michael.leisch@gmx.at', '$2y$10$D750CvJDZFfTrwVcfYDF8eO1FCCqb6.YCW8XpgHJHdScWr5Bx6.3a', 'RM', 'Gesund', '', 185, 75),
-(9, 'Yanik', 'Kendler', 'yanik.kendler@gmail.com', '$2y$10$ngrt8eDQB6OT2trgoXE9duRb.VavmNL5DswlY.ooyh4TWfR4Buup.', '', '', '', 0, 0),
+(9, 'Yanik', 'Kendler', 'yanik.kendler@gmail.com', '$2y$10$ngrt8eDQB6OT2trgoXE9duRb.VavmNL5DswlY.ooyh4TWfR4Buup.', 'TW', 'Gesund', '', 205, 85),
 (10, 'Nieli', 'Nielpferd', 'nieli@nieli.pferd', '$2y$10$5RC83kyWu97K7/yWQnabxOoyS4KDDIeAWhGohDr.1ReGLYm404CXG', 'TW', 'Krank', '', 200, 1000);
 
 -- --------------------------------------------------------
@@ -147,7 +149,9 @@ INSERT INTO `user_team` (`playerID`, `teamID`) VALUES
 (8, 71),
 (8, 72),
 (8, 108),
+(8, 137),
 (9, 71),
+(9, 72),
 (9, 86),
 (10, 119);
 
@@ -221,13 +225,13 @@ ALTER TABLE `user_team_request`
 -- AUTO_INCREMENT für Tabelle `event`
 --
 ALTER TABLE `event`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=30;
 
 --
 -- AUTO_INCREMENT für Tabelle `team`
 --
 ALTER TABLE `team`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=137;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=138;
 
 --
 -- AUTO_INCREMENT für Tabelle `user`
@@ -239,7 +243,7 @@ ALTER TABLE `user`
 -- AUTO_INCREMENT für Tabelle `user_team_request`
 --
 ALTER TABLE `user_team_request`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
