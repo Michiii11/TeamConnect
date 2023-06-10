@@ -249,3 +249,7 @@ COMMIT;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+
+select id, name, playerID as 'captain' from team t
+where 9 not in (select playerID from user_team where teamID like t.id) and
+      9 not in (select playerID from user_team_request where teamID like t.id);

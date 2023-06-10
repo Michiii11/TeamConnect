@@ -108,7 +108,7 @@ class UserRepository
     }
 
     function getPersonalData($id){
-        $sql = "select id, firstname, lastname, email, position, health, rule, height, weight from user where id like $id;";
+        $sql = "select * from user where id like $id;";
         try {
             $result = $this->connection->query($sql);
             if ($result->num_rows == 0) {
@@ -122,9 +122,9 @@ class UserRepository
         }
     }
 
-    function updatePersonalData($id, $firstname, $lastname, $email, $position, $health, $rule, $height, $weight){
+    function updatePersonalData($id, $firstname, $lastname, $email, $position, $health, $rule, $height, $weight, $imagePath){
         $sql = "update user 
-                set firstname = '$firstname', lastname = '$lastname', email = '$email', position = '$position', health = '$health', rule = '$rule', height = '$height', weight = '$weight'
+                set firstname = '$firstname', lastname = '$lastname', email = '$email', position = '$position', health = '$health', rule = '$rule', height = '$height', weight = '$weight', imagePath = '$imagePath'
                 where id like '$id'";
         try {
             mysqli_query($this->connection, $sql);
@@ -144,7 +144,7 @@ class UserRepository
     }
 
     function getPlayer($teamId){
-        $sql = "select u.id as 'id', firstname, lastname, email, position, health, rule, height, weight from team
+        $sql = "select u.id as 'id', firstname, lastname, email, position, health, rule, height, weight, u.imagePath from team
                 join user_team ut on team.id = teamID
                 join user u on ut.playerID = u.id
                 where team.id = {$teamId};";
@@ -163,7 +163,7 @@ class UserRepository
     }
 
     function getPlayerDetails($playerID, $teamID){//todo stats are for all teams summed, you should do it for teams separate
-        $sql = "select u.id as id, firstname, lastname, height, weight, position, health,
+        $sql = "select u.id as id, firstname, lastname, height, weight, position, health, imagePath,
                 nvl(sum(goal), 0) as goals, nvl(sum(assist), 0) as assists, nvl(sum(goal+assist), 0) as scorer, nvl(sum(yellowCard), 0) as yellow, nvl(sum(redCard), 0) as red,
                 (select count(e.id) from event e join user_event ue2 on e.id = ue2.eventID where ue2.playerID = u.id and e.type like 'Spiel') as games,
                 (select count(e.id) from event e join user_event ue2 on e.id = ue2.eventID where ue2.playerID = u.id and e.type not like 'Spiel') as trainings from user u
@@ -181,6 +181,17 @@ class UserRepository
             }
         } catch (mysqli_sql_exception $err) {
             throw new Exception("SQL error occurred: " . $err->getMessage());
+        }
+    }
+
+    function uploadUserIcon(){
+        if ($_FILES["image"]) {
+            $targetDirectory = "../img/";
+            $fileExtension = pathinfo($_FILES["image"]["name"], PATHINFO_EXTENSION);
+            $targetFile = $targetDirectory . "userIcon_" . $_SESSION['userID'] . "." . $fileExtension;
+            move_uploaded_file($_FILES["image"]["tmp_name"], $targetFile);
+
+            return $targetFile;
         }
     }
 

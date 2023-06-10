@@ -27,7 +27,9 @@ $color-contrast: hsl(0, 0%, 90%);
 }
 
 img{
+  border-radius: 50%;
   width:100%;
+  aspect-ratio: 1/1;
   display: block;
 }
 
@@ -277,8 +279,11 @@ main aside.sidebar section.buttons{
     &:hover{
       color: adjust-color($color-contrast, $lightness: -25%);
     }
-    i{
-      padding-right: .5rem;
+    i, img{
+      margin-right: .5rem;
+    }
+    img{
+      width: 1rem;
     }
   }
 }
@@ -487,7 +492,7 @@ main.login{
     flex-direction: column;
   }
 
-  .container{
+  .userContainer{
     width: 65%;
     margin-inline: auto;
     display: flex;
@@ -541,9 +546,14 @@ main.login{
   }
 
   &.personal{
+    #file-upload-user {
+      display: none;
+    }
+
     img{
       cursor: pointer;
       width: 5rem;
+      height: 5rem;
       margin-right: 1rem;
     }
 
@@ -630,6 +640,10 @@ main.login{
           margin-right: 1rem;
           width: 2rem;
         }
+
+        #file-upload-team{
+          display: none;
+        }
       }
     }
 
@@ -710,9 +724,9 @@ main.login{
   color: $color-contrast;
   background-color: $gray-350;
 
-  i{
-    font-size: 1.5rem;
-    padding: .5rem .8rem 0 .5rem;
+  img{
+    width: 2.5rem;
+    margin: .3rem .8rem 0 0;
   }
 
   &.isMyMessage {
@@ -818,6 +832,13 @@ main.login{
 
 /*---------- CalendarBox ----------*/
 //region
+.board section.calendar div.off{
+  display: none;
+}
+.board section.calendar button.off{
+  display: none;
+}
+
 .board section.calendar {
   display: flex;
   flex-direction: column;
@@ -825,10 +846,20 @@ main.login{
 
 .board section.calendar .eventCalendar{
   display: grid;
+  margin-inline: 2rem;
+  text-align: center;
   width: 100%;
   height: 50%;
-  text-align: center;
   background-color: $gray-300;
+
+  .active{
+    background-color: $gray-350;
+    border-radius: 50%;
+  }
+
+  .proven{
+    text-decoration: underline;
+  }
 }
 
 .board section.calendar .eventListNav{
@@ -856,6 +887,20 @@ main.login{
 }
 
 .board section.calendar .eventFull{
+  input, textarea{
+    background-color: transparent;
+    color: $color-contrast;
+    border: none;
+    border-bottom: 1px solid $color-contrast;
+  }
+
+  .buttons{
+    padding: 1rem;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+  }
+
   .header{
     display: flex;
     flex-direction: row;
@@ -869,6 +914,7 @@ main.login{
       margin-right: auto;
     }
     div{
+      text-align: center;
       margin-right: auto;
     }
   }
@@ -878,16 +924,24 @@ main.login{
     border-bottom: 1px solid $color-contrast;
 
     p, label{
-      padding: .5rem 1rem;
       font-size: 1.2rem;
     }
-    input, textarea {
+    label{
+      display: flex;
+      align-items: center;
+    }
+    input, textarea{
       font-size: 1.2rem;
       margin: .5rem 1rem;
-      background-color: $gray-400;
-      color: $color-contrast;
-      border: none;
-      border-bottom: 1px solid $color-contrast;
+      padding: .2rem;
+    }
+    .erg{
+      width: 2rem;
+      text-align: center;
+    }
+    #duration{
+      width: 5rem;
+      text-align: center;
     }
   }
 
@@ -897,19 +951,98 @@ main.login{
 
     label#selectPlayer{
       font-size: 1.5rem;
-    }
-
-    input{
-      accent-color: $primary-main;
-      color-scheme: dark;
+      margin-bottom: 1.5rem;
     }
 
     div {
       display: flex;
       flex-direction: column;
 
-      label, input{
+      label{
         font-size: 1.2rem;
+      }
+    }
+  }
+
+  .gameStats{
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    font-size: 1.2rem;
+    border-bottom: 1px solid $color-contrast;
+
+    label{
+      margin-block: 1rem;
+      display: grid;
+      grid-template-columns: .5fr 1fr;
+    }
+    input{
+      padding: .2rem;
+      margin-inline: 1rem;
+    }
+
+    .dropdown {
+      display: flex;
+      align-items: flex-start;
+      position: relative;
+    }
+
+    .dropdown-input {
+      padding: .3rem;
+      width: 10rem;
+      cursor: pointer;
+      border: none;
+      border-bottom: 1px solid $color-contrast;
+    }
+
+    .selected-members {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-left: 10px;
+    }
+
+    .players{
+      display: flex;
+    }
+
+    .selected-member {
+      display: flex;
+      align-items: center;
+      background-color: transparent;
+      padding: 2px 5px;
+      margin-right: 5px;
+      margin-bottom: 5px;
+    }
+
+    .selected-member span {
+      margin-right: 5px;
+    }
+
+    .selected-member button {
+      border: none;
+      background-color: transparent;
+      cursor: pointer;
+    }
+
+    .dropdown-list {
+      display: none;
+      position: absolute;
+      width: 10rem;
+      max-height: 10rem;
+      overflow-y: auto;
+      border: 1px solid $color-contrast;
+      background-color: $gray-200;
+      padding: .2rem;
+      z-index: 999;
+    }
+
+    .dropdown-list-item {
+      cursor: pointer;
+      padding: .2rem;
+
+      &:hover{
+        background-color: $gray-300;
       }
     }
   }
@@ -1080,6 +1213,16 @@ main.login{
       transition: .2s all;
     }
   }
+
+  img{
+    width: 5rem;
+    margin-block: 1rem;
+    cursor: pointer;
+  }
+}
+
+.file-upload-team{
+  display: none;
 }
 
 .popUp.logoutInfo{
@@ -1100,6 +1243,7 @@ main.login{
 
   &.create{
     padding-top: 1rem;
+
   }
 }
 

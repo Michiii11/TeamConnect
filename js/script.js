@@ -5,13 +5,25 @@ let currentTeamName
 let currentTeamID
 let isCurrentTeamMyTeam
 let amountOfTeams
+let teamIconPath
+
+let currentEventID
 
 function updateDashboard(){
     if(amountOfTeams !== 0){
         getPlayers();
         getEvents();
-        getTeamRequests();
         loadCalendarGrid();
+
+        if(!isCurrentTeamMyTeam){
+            document.querySelector(".calendar button.newButton").classList.add("off")
+        } else{
+            document.querySelector(".calendar button.newButton").classList.remove("off")
+        }
+
+        document.querySelector("aside.sidebar .buttons img").src = curr.imagePath ? curr.imagePath.substring(3) : 'img/userIcon.png';
+        document.querySelector("#chatInputField").value = ""
+        loadMessages()
     } else{
         //todo area for new customers to set up a team
     }
@@ -49,7 +61,6 @@ function checkLogin(){
             }
         })
         .catch((error) => {
-            console.error("Error:", error);
         });
 }
 //endregion
@@ -99,13 +110,11 @@ function getMyTeams(){
             renderAside(answer.data)
         })
         .catch((error) => {
-            console.error("Error:", error);
         });
 }
 function renderAside(data){
     let html = "<div>";
 
-    //todo activated team can get selected
     let i = 0;
     Object.values(data).forEach(item => {
         if(i++ === 0){
@@ -151,6 +160,80 @@ function selectTeam(elem, id){
 }
 //endregion
 
+/********* team chat *********/
+//region
+setInterval(loadMessages, 2000);
+document.querySelector("#chatInputField").addEventListener("keydown", function(event) {
+    if (event.keyCode === 13) {
+        sendMessage()
+    }
+});
+function loadMessages(){
+    if(currentTeamID){
+        const data = {teamID: currentTeamID};
+        fetch("./server/chat.php/getMessages", {
+            method: "POST", // or 'PUT'
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(data),
+        })
+            .then((response) => {
+                return response.json()
+            })
+            .then((data) => {
+                let chatBox = document.querySelector(".chatBox")
+                chatBox.innerHTML = ""
+
+                let messages = []
+                for (const dataKey in data.data) {
+                    curr = data.data[dataKey]
+                    messages.push(`<div class="messageBox ${personalData.id === curr.userID ? 'isMyMessage' : ''}">
+                        <img src="${curr.imagePath ? curr.imagePath.substring(3) : 'img/userIcon.png'}" alt="userIcon">
+                        
+                        <div>
+                            <h3>${curr.firstname} ${curr.lastname}</h3>
+                            <p>${curr.message}</p>
+                        </div>
+                    </div>`)
+                }
+
+                for (let i = messages.length; i >= 0; i--) {
+                    if(messages[i]){
+                        chatBox.innerHTML += messages[i]
+                    }
+                }
+            })
+            .catch((error) => {
+                console.error(`Error:`, error);
+            });
+    }
+}
+
+function sendMessage(){
+    let message = document.querySelector("#chatInputField").value
+    document.querySelector("#chatInputField").value = ""
+    if(message !== ""){
+        const data = {teamID: currentTeamID, message: message};
+        fetch("./server/chat.php/sendMessage", {
+            method: "POST", // or 'PUT'
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(data),
+        })
+            .then((response) => {
+                return response.json()
+            })
+            .then((data) => {
+                loadMessages()
+            })
+            .catch((error) => {
+                console.error(`Error:`, error);
+            });
+    }
+}
+//endregion
 
 /********* popup add team *********/
 //region
@@ -256,44 +339,37 @@ function requestTeam() {
         })
         .then((data) => {
             updateTeams();
-            sendedTeamRequest();
+            sentTeamRequest();
         })
         .catch((error) => {
             console.error(`Error:`, error);
         });
 }
 
-function sendedTeamRequest(){
+function sentTeamRequest(){
     document.querySelector("#findTeamInput").value = ""
 }
 
-/**
- * sends a requested to the team
- */
-function getTeamRequests() {
-    fetch(`./server/user.php/getTeamRequests`)
-        .then((response) => {
-           return response.json()
-        })
-        .then(answer=>{
-        })
-        .catch((error) => {
-            console.error("Error:", error);
-        });
-}
+function enterCreateTeam() {
+    const createTeamInput = document.querySelector("#createTeamInput");
 
-function enterCreateTeam(){
-    document.querySelector("#createTeamInput").addEventListener("keydown", function(event) {
+    const handleKeyDown = function (event) {
         if (event.keyCode === 13) {
+            event.preventDefault(); // Prevent form submission
             createTeam();
+            createTeamInput.removeEventListener("keydown", handleKeyDown);
         }
-    });
+    };
+
+    createTeamInput.addEventListener("keydown", handleKeyDown);
 }
-function createTeam() {
+async function createTeam() {
     let name = document.querySelector("#createTeamInput").value;
 
+    await uploadTeamIcon(false, name.replaceAll(' ', ""))
+
     if (name.length >= 3) {
-        const data = {teamName: name};
+        const data = {teamName: name, imagePath: teamIconPath};
         fetch("./server/team.php/createTeam", {
             method: "POST", // or 'PUT'
             headers: {
@@ -310,7 +386,6 @@ function createTeam() {
             })
             .catch((error) => {
                 document.querySelector(".error.create").innerHTML = `Team Name ist bereits benutzt`
-                console.error(`Error:`, error);
             });
     } else {
         document.querySelector(".error.create").innerHTML = `Der Name muss mindestens aus 3 Zeichen bestehen`
@@ -342,10 +417,10 @@ function renderPlayers(data){
     Object.values(data).forEach(item => {
         html += `
             <div onclick="toggleDetail(this, '${item.id}')" class="playerBox">
-                <img src="img/userIcon.png" alt="userIcon">
+                <img src="${item.imagePath ? item.imagePath.substring(3) : 'img/userIcon.png'}" alt="userIcon">
                 <div class="playerStats">
                     <h2>${item.firstname} ${item.lastname}</h2>
-                    <p>${item.position} - ${item.health.toUpperCase()} - STAMMSPIELER</p>
+                    <p>${item.position} - ${item.health.toUpperCase()}</p>
                 </div>
                 <i class="fa-solid fa-eye"></i>
             </div>`
@@ -370,14 +445,12 @@ function toggleDetail(elem, playerID){
         })
         .then((answer) => {
             let person = answer.data
-            console.log(person)
-
             if(elem.classList.contains("detail")){
                 let goalPerGame = person.goals / person.games;
                 let assistPerGame = person.assists / person.games;
                 let scorerPerGame = person.scorer / person.games;
 
-                elem.innerHTML = `<div class="userIconName"><img src="img/userIcon.png" alt="userIcon"><h1>${person.firstname} ${person.lastname}</h1></div>
+                elem.innerHTML = `<div class="userIconName"><img src="${person.imagePath ? person.imagePath.substring(3) : 'img/userIcon.png'}" alt="userIcon"><h1>${person.firstname} ${person.lastname}</h1></div>
                 <div class="stats">
                     <div><p>Größe: ${person.height}</p><p>Gewicht: ${person.weight}</p></div>
                     <div><p>Position: ${person.position}</p><p>Status: ${person.health}</p></div>
@@ -387,10 +460,10 @@ function toggleDetail(elem, playerID){
                     <div><p>Spiele: ${person.games}</p><p>Trainings: ${person.trainings}</p></div>
                 </div>`
             } else{
-                elem.innerHTML = `<img src="img/userIcon.png" alt="userIcon">
+                elem.innerHTML = `<img src="${person.imagePath ? person.imagePath.substring(3) : 'img/userIcon.png'}" alt="userIcon">
                         <div class="playerStats">
                             <h2>${person.firstname} ${person.lastname}</h2>
-                            <p>${person.position} - ${person.health.toUpperCase()} - STAMMSPIELER</p>
+                            <p>${person.position} - ${person.health.toUpperCase()}</p>
                         </div>
                         <i class="fa-solid fa-eye"></i>`
             }
@@ -405,55 +478,104 @@ function toggleDetail(elem, playerID){
 
 /********* calendar box *********/
 //region
+function refreshEventSection(isStart){
+    loadCalendarGrid();
+    getEvents();
+
+    if(!isStart){
+        renderPlayersForEvent()
+    }
+}
 function loadCalendarGrid(){
     let year = new Date().getFullYear();
     let month = new Date().getMonth();
     let today = new Date().getDate();
 
-    var monthNames = ["January", "February", "March", "April", "May", "June",
+    let monthNames = ["January", "February", "March", "April", "May", "June",
         "July", "August", "September", "October", "November", "December"
     ];
-    var monthDays = [31, 28 + isLeapYear(year), 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+    let monthDays = [31, 28 + isLeapYear(year), 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
 
-    var firstDay = new Date(year, month, 1);
-    var startingDay = firstDay.getDay();
+    let firstDay = new Date(year, month, 1);
+    let startingDay = firstDay.getDay();
     if (startingDay == 0) {
         startingDay = 7;
     }
 
-    var monthLength = monthDays[month];
+    let monthLength = monthDays[month];
     if (month == 1) { // February
         monthLength = isLeapYear(year) ? 29 : 28;
     }
 
-    var monthHtml = "<table><tr><th colspan='7'>" + monthNames[month] + " " + year + "</th></tr>";
+    let monthHtml = "<table><tr><th colspan='7'>" + monthNames[month] + " " + year + "</th></tr>";
     monthHtml += "<tr><th>Mon</th><th>Tue</th><th>Wed</th><th>Thu</th><th>Fri</th><th>Sat</th><th>Sun</th></tr><tr>";
 
-    var day = 1;
-    // fill in the days
-    for (var i = 1; i <= 42; i++) {
-        if (i < startingDay || i > startingDay + monthLength) {
-            monthHtml += "<td>&nbsp;</td>";
-        } else {
-            var date = year + "-" + padNumber(month + 1) + "-" + padNumber(day);
-            monthHtml += "<td><button onclick='selectDate(\"" + date + "\")'>" + day + "</button></td>";
-            day++;
+    let day = 1;
+
+    getEventsThisMonth().then(eventsThisMonth => {
+        // fill in the days
+        for (let i = 1; i <= 42; i++) {
+            if (i < startingDay || i > startingDay + monthLength) {
+                monthHtml += "<td>&nbsp;</td>";
+            } else {
+                let date = year + "-" + padNumber(month + 1) + "-" + padNumber(day);
+                monthHtml += `<td class="${isToday(new Date(date)) ? "active " : ""}"><button class="${eventsThisMonth.includes(date.substring(date.length-2)) ? 'proven' : ""}" onclick='selectDate("${date}", this.parentNode)'>${day}</button></td>`;
+                day++;
+            }
+
+            if (i % 7 == 0 && day <= monthLength) {
+                monthHtml += "</tr><tr>";
+            }
         }
 
-        if (i % 7 == 0 && day <= monthLength) {
-            monthHtml += "</tr><tr>";
-        }
-    }
+        monthHtml += "</tr></table>";
 
-    monthHtml += "</tr></table>";
-
-    document.querySelector(".calendar .eventCalendar").innerHTML = monthHtml
+        document.querySelector(".calendar .eventCalendar").innerHTML = monthHtml;
+    });
 }
 function isLeapYear(year) {
     return (year % 4 == 0 && year % 100 != 0) || year % 400 == 0;
 }
 function padNumber(number) {
     return ("0" + number).slice(-2);
+}
+
+function getEventsThisMonth() {
+    return new Promise((resolve, reject) => {
+        let eventsThisMonth = [];
+
+        if (currentTeamID) {
+            const data = { teamID: currentTeamID, month: new Date().getMonth() + 1 };
+            fetch("./server/team.php/getEventsThisMonth", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(data),
+            })
+                .then((response) => response.json())
+                .then((data) => {
+                    for (const dataKey in data.data) {
+                        eventsThisMonth.push(data.data[dataKey].date.substring(data.data[dataKey].date.length - 2));
+                    }
+                    resolve(eventsThisMonth);
+                })
+                .catch((error) => {
+                    console.error(`Error:`, error);
+                    reject(error);
+                });
+        } else {
+            resolve(eventsThisMonth);
+        }
+    });
+}
+
+function selectDate(date, elem){
+    if(document.querySelector("table .active")){
+        document.querySelector("table .active").classList.remove("active")
+    }
+    filterEventList(document.querySelectorAll(".eventListNav p")[1], date)
+    elem.classList.add("active")
 }
 
 function getEvents(){
@@ -469,15 +591,41 @@ function getEvents(){
         });
 }
 
-function filterEventList(elem){
-    document.querySelector(".eventListNav .active").classList.remove("active");
+function filterEventList(elem, spezificDate){
+    if(document.querySelector(".eventListNav .active")){
+        document.querySelector(".eventListNav .active").classList.remove("active");
+    }
     elem.classList.add("active");
+    if(spezificDate) {
+        elem.innerHTML = spezificDate
+    } else{
+        document.querySelectorAll(".eventListNav p")[1].innerHTML = "Today"
+        document.querySelector(".eventCalendar .active").classList.remove("active")
+        document.querySelectorAll(".eventCalendar button").forEach((elem) => {
+            if(elem.innerHTML == new Date().getDate()){
+                elem.parentElement.classList.add("active")
+            }
+        })
+    }
+
+    localStorage.setItem("teamConnectEventFilter", elem.innerHTML)
     getEvents();
 }
 
 function renderEventList(data){
-    let html = "";
-    let filterType = document.querySelector(".eventListNav .active").innerHTML
+    if(!localStorage.getItem("teamConnectEventFilter")){
+        localStorage.setItem("teamConnectEventFilter", document.querySelector(".eventListNav .active").innerHTML)
+    } else {
+        if(document.querySelector(".eventListNav .active")){
+            document.querySelector(".eventListNav .active").classList.remove("active");
+        }
+        document.querySelectorAll(".eventListNav p").forEach((elem) => {
+            if(elem.innerHTML === localStorage.getItem("teamConnectEventFilter")){
+                elem.classList.add("active")
+            }
+        })
+    }
+    let filterType = localStorage.getItem("teamConnectEventFilter")
     let dataArray = []
 
     for (const curr in data) {
@@ -488,6 +636,7 @@ function renderEventList(data){
     });
 
 
+    document.querySelector(".board section.calendar .eventList").innerHTML = "";
     Object.values(dataArray).forEach(item => {
         let isCurrentItemIsTrue = false;
         let date = new Date(item.date);
@@ -496,19 +645,29 @@ function renderEventList(data){
             isCurrentItemIsTrue = true;
         }else if(filterType === "Today" && isToday(date)){
             isCurrentItemIsTrue = true;
+        } else if(document.querySelector(".eventListNav .active") && date.getDate() === (new Date(document.querySelector(".eventListNav .active").innerHTML)).getDate()) {
+            isCurrentItemIsTrue = true;
         } else if(filterType === "All"){
             isCurrentItemIsTrue = true;
         }
 
         if(isCurrentItemIsTrue){
-            html += renderEvent(item);
+            checkIfPlayerIsInEvent(item.id)
+                .then(isValidEvent => {
+                    if (isValidEvent || isCurrentTeamMyTeam) {
+                        document.querySelector(".board section.calendar .eventList").innerHTML += renderEvent(item);
+                    }
+                })
+                .catch(error => {
+                    console.error(error);
+                    // Handle any errors that occurred during the fetch request
+                });
         }
     });
-    document.querySelector(".board section.calendar .eventList").innerHTML = html
 }
 
 function renderEvent(item){
-    return `<div class="eventBox" onclick="toggleEvent(${item.id})">
+    return `<div class="eventBox" onclick="toggleEvent('${item.id}', '${item.date}', '${item.time}', '${item.type}', '${item.description}', '${item.duration}', '${item.result}', '${item.notions}')">
                 ${getEventIcon(item.type)}
                 <div>
                     <h4>${item.description ? item.description : item.type}</h4>
@@ -516,6 +675,27 @@ function renderEvent(item){
                 </div>
             </div>`
 }
+
+async function checkIfPlayerIsInEvent(eventID) {
+    const data = { eventID: eventID };
+
+    try {
+        const response = await fetch("./server/team.php/checkIfPlayerIsInEvent", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(data),
+        });
+
+        const responseData = await response.json();
+        return responseData.data;
+    } catch (error) {
+        console.error("Error:", error);
+        throw error; // Propagate the error to the caller
+    }
+}
+
 
 function getEventIcon(eventType){
     switch (eventType){
@@ -558,46 +738,363 @@ function updateIconOnNewEventField(){
     document.querySelector(".newEventIcon").innerHTML = getEventIcon(document.querySelector("#typeSelector").value)
 }
 function addEvent(){
-    let type = document.querySelector("#typeSelector").value;
-    let description = document.querySelector("#descriptionInput").value;
-    let date = document.querySelector("#dateInput").value;
-    let time = document.querySelector("#timeInput").value;
-    let duration = document.querySelector("#durationInput").value;
-    const zeroPad = (num, places) => String(num).padStart(places, '0')
+    if(isCurrentTeamMyTeam){
+        let type = document.querySelector("#typeSelector").value;
+        let description = document.querySelector("#descriptionInput").value;
+        let date = document.querySelector("#dateInput").value;
+        let time = document.querySelector("#timeInput").value;
+        let duration = document.querySelector("#durationInput").value;
+        const zeroPad = (num, places) => String(num).padStart(places, '0')
 
-    if(type !== ""){
-        date = date ? date : `${new Date().getFullYear()}-${zeroPad(new Date().getMonth()+1, 2)}-${zeroPad(new Date().getDate(), 2)}`;
-        time = time ? time : `${zeroPad(new Date().getHours(), 2)}:${zeroPad(new Date().getMinutes(), 2)}`
+        if(type !== ""){
+            date = date ? date : `${new Date().getFullYear()}-${zeroPad(new Date().getMonth()+1, 2)}-${zeroPad(new Date().getDate(), 2)}`;
+            time = time ? time : `${zeroPad(new Date().getHours(), 2)}:${zeroPad(new Date().getMinutes(), 2)}`
 
-        const data = {teamID: currentTeamID, type: type, description: description, date: date, time: time, duration: duration};
-        fetch("./server/team.php/addEvent", {
-            method: "POST", // or 'PUT'
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify(data),
-        })
-            .then((response) => {
-                return response.json()
+            const data = {teamID: currentTeamID, type: type, description: description, date: date, time: time, duration: duration};
+            fetch("./server/team.php/addEvent", {
+                method: "POST", // or 'PUT'
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(data),
             })
-            .then((data) => {
-                toggleNewEventField();
-                getEvents()
-            })
-            .catch((error) => {
-                console.error(`Error:`, error);
-            });
-    }else{
-        console.log("Error")
+                .then((response) => {
+                    return response.json()
+                })
+                .then((data) => {
+                    refreshEventSection()
+                })
+                .catch((error) => {
+                    console.error(`Error:`, error);
+                });
+        }else{
+            console.log("Error")
+        }
     }
 }
 
-function toggleEvent(id){
+function updateEvent(type){
+    let time = document.querySelector("#timePicker").value;
+    let date = document.querySelector("#datePicker").value;
+    let duration = document.querySelector("#duration").value;
+    let description = document.querySelector("#descriptionField").value
+    let result = ""; let notions = "";
+    if(type === "Spiel"){
+        let home = document.querySelector(".home").value
+        let guest = document.querySelector(".guest").value
+        result = `${home === "" ? 0 : home}:${guest === "" ? 0 : guest}`
+    } else{
+        notions = document.querySelector("#notizField").value;
+    }
 
+    // base section
+    let data = {eventID: currentEventID, date: date, time: time, duration: duration, description: description, result: result, notions: notions};
+    fetch("./server/team.php/updateEvent", {
+        method: "POST", // or 'PUT'
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+    })
+        .then((response) => {
+            return response.json()
+        })
+        .then((data) => {
+
+        })
+        .catch((error) => {
+            console.error(`Error:`, error);
+        });
+
+    // players section
+    let playerIDs = []
+    document.querySelectorAll(".checkbox").forEach((elem) => {
+        if(!elem.classList.contains("all") && elem.checked){
+            playerIDs.push(elem.classList[1].substring(1))
+        }
+    })
+
+    data = {playerList: playerIDs, eventID: currentEventID}
+    fetch("./server/team.php/setPlayersToEvent", {
+        method: "POST", // or 'PUT'
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+    })
+        .then((response) => {
+            return response.json()
+        })
+        .then((data) => {
+
+        })
+        .catch((error) => {
+            console.error(`Error:`, error);
+        });
+
+    // stats section
+
+
+    toggleEvent();
+    refreshEventSection(true);
 }
 
-function editEvent(){
+function deleteEvent(){
+    const data = {eventID: currentEventID};
+    fetch("./server/team.php/deleteEvent", {
+        method: "POST", // or 'PUT'
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+    })
+        .then((response) => {
+            return response.json()
+        })
+        .then((data) => {
+            toggleEvent();
+            refreshEventSection();
+        })
+        .catch((error) => {
+            console.error(`Error:`, error);
+        });
+}
 
+function deleteEventInfo(eventID){
+    //todo delte event info
+}
+
+function toggleEvent(id, date, time, type, description, duration, result, notions){
+    document.querySelector(".eventListNav").classList.toggle("off")
+    document.querySelector(".eventCalendar").classList.toggle("off")
+    document.querySelector(".eventList").classList.toggle("off")
+    document.querySelector(".newButton").classList.toggle("off")
+    let eventFullHTML = document.querySelector(".eventFull")
+    currentEventID = id
+
+    if(eventFullHTML.innerHTML === ""){
+        let homeGoals;
+        let guestGoals;
+
+        if(type === "Spiel"){
+            let goals = result.split(":");
+            homeGoals = goals[0]
+            guestGoals = goals[1]
+        }
+
+        eventFullHTML.innerHTML = `<div class="header">
+            <i onclick="toggleEvent()" class="fa-solid fa-arrow-left"></i>
+            <div>
+                <h2>${type}</h2>
+                <input type="date" id="datePicker" value="${date}">
+            </div>
+        </div>
+
+        <div class="description">
+            <label for="timePicker">Zeit:<input type="time" id="timePicker" value="${time}">Dauer (in h):<input type="number" id="duration" value="${duration}"></label>
+            <label for="descriptionField">Beschreibung:<input type="text" id="descriptionField" value="${description}"></label>
+            ${type === "Spiel" ? `<label>Ergebnis:<input type="number" class="erg home" value="${homeGoals}"/>:<input type="number" class="erg guest" value="${guestGoals}"/></label>` : `<label>Notizen:<textarea rows="1" id="notizField">${notions}</textarea></label>`}
+        </div>
+
+        <div class="playerSelect">
+            <label class="container" id="selectPlayer">Spieler auswählen
+                <input onclick="playerSelector(this)" type="checkbox" class="checkbox all">
+                <span class="checkmark"></span>
+            </label>
+            <div class="playerList">
+                ${renderPlayersForEvent()}
+            </div>
+        </div>
+
+        ${type === "Spiel" ? renderGameStats() : ""}
+        
+        <div class="buttons">
+            <button onclick="deleteEvent()" class="outlined">Delete</button>
+            <button onclick="updateEvent('${type}')" class="filled">Save</button>
+        </div>`
+    } else{
+        eventFullHTML.innerHTML = ""
+    }
+}
+
+function renderGameStats(){
+    return `<div class="gameStats">
+        <label>Torschützen:
+            <div class="players">
+                <div class="selected-members"></div>
+                <input class="dropdown-input" type="text" placeholder="Spieler suchen" onclick="editPropertyDropdown('goal', this)">
+            </div>
+            <div class="dropdown-list"></div>
+        </label>
+        
+        <label>Assists:
+            <div class="players">
+                <div class="selected-members"></div>
+                <input class="dropdown-input" type="text" placeholder="Spieler suchen" onclick="editPropertyDropdown('assist', this)">
+            </div>
+            <div class="dropdown-list"></div>
+        </label>
+   
+        <label>Gelbe Karten:
+            <div class="players">
+                <div class="selected-members"></div>
+                <input class="dropdown-input" type="text" placeholder="Spieler suchen" onclick="editPropertyDropdown('yellow', this)">
+            </div>
+            <div class="dropdown-list"></div>
+        </label>
+        
+        <label>Rote Karten:
+            <div class="players">
+                <div class="selected-members"></div>
+                <input class="dropdown-input" type="text" placeholder="Spieler suchen" onclick="editPropertyDropdown('red', this)">
+            </div>
+            <div class="dropdown-list"></div>
+        </label>
+    </div>`
+}
+
+let playersForCurrentEvent = []
+function editPropertyDropdown(prop, elem){
+    playersForCurrentEvent = []
+    let players = []
+    document.querySelectorAll(".playerList label").forEach((elem) => {
+        if(elem.querySelector("input").checked && !elem.querySelector("input").classList.contains("all")){
+            playersForCurrentEvent.push({name: elem.innerHTML.split('\n')[0], id: elem.querySelector("input").classList[1].substring(1)})
+            players.push(elem.innerHTML.split('\n')[0])
+        }
+    })
+
+    let doubleParent = elem.parentElement.parentElement
+    let list = doubleParent.querySelector(".dropdown-list")
+    let inputs = document.querySelectorAll("input.dropdown-input")
+
+    elem.addEventListener('input', () => {
+        const enteredText = elem.value.trim();
+        let filteredMembers = players.filter(player => player.toLowerCase().includes(enteredText.toLowerCase()));
+
+        list.innerHTML = ''; // Leere die Liste
+
+        // Erzeuge eine Option für jedes gefilterte Mitglied
+        filteredMembers.forEach(member => {
+            const listItem = document.createElement('div');
+            listItem.textContent = member;
+            listItem.classList.add('dropdown-list-item');
+            list.appendChild(listItem);
+        });
+    });
+
+    elem.addEventListener("keydown", function(event) {
+        if (event.keyCode === 13) {
+            confirmPropertyDropdown(elem, prop)
+        }
+    });
+
+    inputs.forEach((elem) => {
+        elem.addEventListener('blur', () => {
+            closePropertyDropdown()
+        });
+    })
+
+    //position popup
+    let editPopup = elem.parentElement.parentElement.querySelector(".dropdown-list")
+    let rect = elem.getBoundingClientRect()
+    editPopup.style.top = rect.top - document.querySelector("nav").clientHeight + rect.height + "px"
+    editPopup.style.left = rect.left - document.querySelector("aside").clientWidth + "px"
+
+    let html = "";
+    Object.entries(playersForCurrentEvent).forEach(item => {
+        html += `<p class="dropdown-list-item" onclick="confirmPropertyDropdown(this, '${prop}', '${item[1].id}', '${item[1].name}')">${item[1].name}</p>`
+    })
+
+    doubleParent.querySelector(".dropdown-list").innerHTML = html;
+    doubleParent.querySelector(".dropdown-list").style.display = "block";
+}
+
+function closePropertyDropdown(event){
+/*    document.querySelectorAll(".dropdown-list").forEach((elem) => {
+        elem.style.display = "none"
+    });*/
+}
+
+function confirmPropertyDropdown(elem, prop, ID, name){
+    if(!ID && !name){
+        name = elem.parentElement.parentElement.querySelectorAll(".dropdown-list div")[0].innerHTML
+    }
+    setTimeout(() => {
+        elem.parentElement.parentElement.querySelector(".selected-members").innerHTML += `<span>${name}</span>`
+    }, 1000)
+}
+
+function renderPlayersForEvent(){
+    fetch(`./server/user.php/getPlayer?teamID=${currentTeamID}`)
+        .then((response) => {
+            return response.json()
+        })
+        .then(answer=>{
+            html = ""
+
+            for (const item in answer.data) {
+                html +=
+                    `<label class="container">${answer.data[item].firstname} ${answer.data[item].lastname}
+                        <input onclick="playerSelector(this)" type="checkbox" class="checkbox c${answer.data[item].id}">
+                        <span class="checkmark"></span>
+                    </label>`
+            }
+            document.querySelector(".playerSelect .playerList").innerHTML = html
+
+            return answer
+        })
+        .then(answer=> {
+            checkPlayerAlreadyChecked()
+        })
+        .catch((error) => {
+            console.error("Error:", error);
+        });
+}
+
+function checkPlayerAlreadyChecked(){
+    let data = {eventID: currentEventID}
+    fetch("./server/team.php/getPlayersForEvent", {
+        method: "POST", // or 'PUT'
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+    })
+        .then((response) => {
+            return response.json()
+        })
+        .then((data) => {
+            let answer = data.data
+            for (const answerKey in answer) {
+                document.querySelector(`.checkbox.c${answer[answerKey].id}`).checked = true
+                playerSelector(document.querySelector(`.checkbox.c${answer[answerKey].id}`))
+            }
+        })
+        .catch((error) => {
+            console.error(`Error:`, error);
+        });
+}
+
+function playerSelector(elem){
+    let isChecked = elem.checked
+    let checkedBoxesCount = 0
+    let checkBoxCount = document.querySelectorAll(".checkbox").length - 1
+    document.querySelectorAll(".checkbox").forEach((item) => {
+        if(item.checked){
+            checkedBoxesCount++;
+        }
+    })
+
+    if(elem.classList.contains("all") || checkBoxCount === checkedBoxesCount){
+        if(!elem.classList.contains("all") && elem.checked === false){
+            document.querySelector(".checkbox.all").checked = false
+        } else{
+            document.querySelectorAll(".checkbox").forEach((item) => {
+                item.checked = elem.classList.contains("all") ? isChecked : true;
+            })
+        }
+    }
 }
 
 function getDayByDate(dateStr){
@@ -632,7 +1129,9 @@ function toggleNotification(){
 }
 
 function updateNotifications(){
-    document.querySelector("aside.notification").innerHTML = "<h1>Nachrichten</h1>"
+    let notificationField = document.querySelector("aside.notification")
+    notificationField.innerHTML = "<h1>Nachrichten</h1>"
+
     fetch("./server/team.php/getTeamRequests")
         .then((response) => {
             return response.json()
@@ -640,7 +1139,9 @@ function updateNotifications(){
         .then((data) => {
             for (const dataKey in data.data) {
                 let curr = data.data[dataKey]
-                document.querySelector("aside.notification").innerHTML +=
+                console.log(curr)
+
+                notificationField.innerHTML +=
                     `<div class="newNotification request r${curr.id}">
                     <img src="img/userIcon.png" alt="userIcon">
                     <p>${curr.firstname} ${curr.lastname} will deinem Team "${curr.teamName}" beitreten.</p>
@@ -732,22 +1233,29 @@ function updatePersonalDataInputs(){
             document.querySelector(`#${argumentsKey}`).value = personalData[argumentsKey]
         }
     }
+
+    if(document.querySelector("#image-preview img")){
+        document.querySelector("#image-preview img").src = personalData.imagePath.substring(3);
+        document.querySelector("aside.sidebar .buttons img").src = personalData.imagePath.substring(3);
+    }
 }
 
-function updatePersonalData(){
+async function updatePersonalData() {
     for (const argumentsKey in personalData) {
-        if(document.querySelector(`#${argumentsKey}`)){
+        if (document.querySelector(`#${argumentsKey}`)) {
             personalData[argumentsKey] = document.querySelector(`#${argumentsKey}`).value
         }
     }
 
+    await uploadUserIcon();
+
     let errorField = document.querySelector(".error.personal")
     errorField.innerHTML = "";
-    if(personalData.firstname === "" || personalData.lastname === "" || personalData.email === ""){
+    if (personalData.firstname === "" || personalData.lastname === "" || personalData.email === "") {
         errorField.innerHTML = "Firstname, Lastname and Email has to be filled"
-    } else if(!/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/.test(personalData.email)){
+    } else if (!/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/.test(personalData.email)) {
         errorField.innerHTML = "Invalid email address"
-    } else{
+    } else {
         fetch("./server/user.php/updatePersonalData", {
             method: "POST", // or 'PUT'
             headers: {
@@ -870,7 +1378,11 @@ function updateTeamList(){
             Object.values(answer.data).forEach(item => {
                 html += `
                     <div class='.teams T${item.name.replaceAll(' ', "")}'>
-                        <img src="img/userIcon.png" alt="userIcon">
+                        <label for="file-upload-${item.name.replaceAll(' ', "")}" id="image-preview-${item.name.replaceAll(' ', "")}">
+                            <img src="${item.imagePath ? item.imagePath.substring(3) : 'img/userIcon.png'}" alt="userIcon">
+                        </label>
+                        <input class="file-upload-team" disabled type="file" id="file-upload-${item.name.replaceAll(' ', "")}" onchange="updateImage(this, '${item.name.replaceAll(' ', "")}')" accept="image/png, image/jpeg">
+                        
                         <p>${item.name}</p>
                         <div class="edit">
                             <i class="fa-solid fa-pen" onclick="changeTeamViewToEdit('${item.name}')"></i>
@@ -885,22 +1397,28 @@ function updateTeamList(){
         });
 }
 
-function changeTeamViewToEdit(teamName){
+async function changeTeamViewToEdit(teamName){
     let teamBox = document.querySelector(`.teams .T${teamName.replaceAll(' ', "")} p`)
     let icon = document.querySelectorAll(`.teams .T${teamName.replaceAll(' ', "")} i.fa-solid`)[0]
+    let img = document.querySelector(`.teams .T${teamName.replaceAll(' ', "")} img`)
     icon.classList.toggle("fa-pen")
     icon.classList.toggle("fa-floppy-disk")
 
     if(teamBox.querySelector("input")){
+        img.style.cursor = `cursor`
+        document.querySelector(`#file-upload-${teamName.replaceAll(' ', "")}`).disabled = true
+        await uploadTeamIcon(true, teamName.replaceAll(' ', ""));
         changeTeamName(teamName, teamBox.querySelector("input").value);
     } else{
+        img.style.cursor = `pointer`
+        document.querySelector(`#file-upload-${teamName.replaceAll(' ', "")}`).disabled = false
         teamBox.innerHTML = `<input type="text" value="${teamName}"/>`
     }
 }
 function changeTeamName(oldTeamName, newTeamName){
     let teamBox = document.querySelector(`.teams .T${oldTeamName.replaceAll(' ', "")} p`)
 
-    const data = {oldTeamName: oldTeamName, newTeamName: newTeamName};
+    const data = {oldTeamName: oldTeamName, newTeamName: newTeamName, imagePath: teamIconPath};
     fetch("./server/team.php/changeTeamName", {
         method: "POST", // or 'PUT'
         headers: {
@@ -950,3 +1468,72 @@ function deleteTeam(teamName){
             console.error(`Error:`, error);
         });
 }
+
+function updateImage(elem, value){
+    let file = elem.files[0];
+    let reader = new FileReader();
+
+    reader.onload = function(e) {
+        document.getElementById(`image-preview-${value}`).getElementsByTagName("img")[0].src = e.target.result;
+    };
+
+    reader.readAsDataURL(file);
+}
+
+function uploadUserIcon(){
+    return new Promise((resolve, reject) => {
+        let fileInput = document.getElementById(`file-upload-user`);
+        let file = fileInput.files[0];
+
+        if (file) {
+            let formData = new FormData();
+            formData.append("image", file);
+
+            fetch("./server/user.php/uploadUserIcon", {
+                method: "POST",
+                body: formData
+            })
+                .then((response) => response.json())
+                .then((data) => {
+                    personalData.imagePath = data.data;
+                    resolve(); // Resolve the promise after the upload is finished successfully
+                })
+                .catch((error) => {
+                    console.error("Image upload failed. Error: " + error);
+                    reject(error); // Reject the promise if there's an error during the upload
+                });
+        } else {
+            resolve(); // Resolve the promise if there's no file to upload
+        }
+    });
+}
+
+function uploadTeamIcon(isTeam, teamName) {
+    return new Promise((resolve, reject) => {
+        let fileInput = document.getElementById(`file-upload-${isTeam ? teamName.replaceAll(' ', "") : 'group'}`);
+        let file = fileInput.files[0];
+
+        if (file) {
+            let formData = new FormData();
+            formData.append("image", file);
+
+            fetch(`./server/team.php/uploadTeamIcon?teamName=${teamName}`, {
+                method: "POST",
+                body: formData
+            })
+                .then((response) => response.json())
+                .then((data) => {
+                    teamIconPath = data.data;
+                    resolve(); // Resolve the promise after the upload is finished successfully
+                })
+                .catch((error) => {
+                    console.error("Image upload failed. Error: " + error);
+                    reject(error); // Reject the promise if there's an error during the upload
+                });
+        } else {
+            resolve(); // Resolve the promise if there's no file to upload
+        }
+    });
+}
+
+refreshEventSection(true)

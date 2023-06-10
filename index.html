@@ -28,7 +28,7 @@
 
         <section class="buttons">
             <div onclick="toggleNotification()"><i class="fa-solid fa-bell"></i><p>Benachrichtigung</p></div>
-            <div onclick="toggleUserSettings()"><i class="fa-solid fa-circle-user"></i><p class="userName">Benutzer</p></div>
+            <div onclick="toggleUserSettings()"><img src="./img/userIcon.png"><p class="userName">Benutzer</p></div>
         </section>
     </aside>
     <aside class="notification">
@@ -69,7 +69,11 @@
 
                 <div class="create active">
                     <h2>Team erstellen</h2>
-                    <i class="fa-solid fa-camera"></i>
+                    <label for="file-upload-group" id="image-preview-group">
+                        <img src="img/groupIcon.jpg" alt="groupIcon">
+                    </label>
+                    <input style="display: none" type="file" id="file-upload-group" onchange="updateImage(this, 'group')" accept="image/png, image/jpeg">
+
                     <input onkeydown="enterCreateTeam()" id="createTeamInput" type="text" placeholder="Teamname">
 
                     <p class="error create"></p>
@@ -91,10 +95,13 @@
         </div>
 
         <div class="userSettings">
-            <div class="container">
+            <div class="userContainer">
                 <section class="personal">
                     <div class="first">
-                        <img src="img/userIcon.png" alt="userIcon">
+                        <label for="file-upload-user" id="image-preview-user">
+                            <img src="img/userIcon.png" alt="userIcon">
+                        </label>
+                        <input type="file" id="file-upload-user" onchange="updateImage(this, 'user')" accept="image/png, image/jpeg">
                         <input type="text" id="firstname"><input type="text" id="lastname">
                     </div>
 
@@ -163,78 +170,20 @@
         <div class="sections active">
             <section class="chat">
                 <div class="chatBox">
-                    <div class="messageBox">
-                        <i class="fa-solid fa-circle-user"></i>
-                        <div>
-                            <h3>Michael Leisch</h3>
-                            <p>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam</p>
-                        </div>
-                    </div>
 
-                    <div class="messageBox isMyMessage sameUser">
-                        <i class="fa-solid fa-circle-user"></i>
-                        <div>
-                            <h3>Michael Leisch</h3>
-                            <p>Lorem ipsum dolor sit amet, consetetur sadipscing elitr,</p>
-                        </div>
-                    </div>
-
-                    <div class="messageBox isMyMessage">
-                        <i class="fa-solid fa-circle-user"></i>
-                        <div>
-                            <h3>Michael Leisch</h3>
-                            <p>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.</p>
-                        </div>
-                    </div>
-
-                    <div class="messageBox">
-                        <i class="fa-solid fa-circle-user"></i>
-                        <div>
-                            <h3>Michael Leisch</h3>
-                            <p>Lorem ipsum dolor sit amet,</p>
-                        </div>
-                    </div>
                 </div>
 
                 <div class="inputBox">
                     <input id="chatInputField" type="text" placeholder="Schreibe eine Nachricht">
-                    <button class="filled">Senden</button>
+                    <button onclick="sendMessage()" class="filled">Senden</button>
                 </div>
             </section>
 
             <section class="player"></section>
 
             <section class="calendar">
-                <div class="eventFull">
-                    <div class="header">
-                        <i class="fa-solid fa-arrow-left"></i>
-                        <div>
-                            <h2>Fußballtraining</h2>
-                            <p>Samstag, 15.06.2023 - 21:12 Uhr</p>
-                        </div>
-                    </div>
-
-                    <div class="description">
-                        <p>von 20:15 bis 22:15</p>
-                        <Label for="descriptionField">Beschreibung:</Label><input type="text" id="descriptionField"><br>
-                        <Label for="notizField">Notizen:</Label><textarea id="notizField"></textarea>
-                    </div>
-
-                    <div class="playerSelect">
-                        <label class="container" id="selectPlayer">Spieler auswählen
-                            <input type="checkbox">
-                            <span class="checkmark"></span>
-                        </label>
-                        <div class="playerList">
-                            <label class="container">Spieler auswählen
-                                <input type="checkbox">
-                                <span class="checkmark"></span>
-                            </label>
-                        </div>
-                    </div>
-                </div>
-
-                <!--<div class="eventCalendar"></div>
+                <div class="eventFull"></div>
+                <div class="eventCalendar"></div>
                 <div class="eventListNav">
                     <p class="active" onclick="filterEventList(this)">Upcoming</p>
                     <p onclick="filterEventList(this)">Today</p>
@@ -242,7 +191,7 @@
                 </div>
                 <div class="eventList"></div>
 
-                <button onclick="toggleNewEventField()" class="newButton"><i class="fa-solid fa-plus"></i>NEUER EINTRAG</button>-->
+                <button onclick="toggleNewEventField()" class="newButton"><i class="fa-solid fa-plus"></i>NEUER EINTRAG</button>
             </section>
         </div>
     </div>

@@ -16,9 +16,9 @@ class TeamRepository
             exit;
         }
     }
-    function createTeam($id, $teamName){
+    function createTeam($id, $teamName, $imagePath){
         try {
-            $sql = "INSERT INTO team (playerID, name) VALUES ('$id', '$teamName')";
+            $sql = "INSERT INTO team (playerID, name, imagePath) VALUES ('$id', '$teamName', '$imagePath')";
             mysqli_query($this->connection, $sql);
 
             $teamId = $this->getTeamByLeader($id, $teamName);
@@ -73,9 +73,9 @@ class TeamRepository
 
     function getAllTeamsNotEnteredYet(){
         $id = $_SESSION["userID"];
-        $sql = "select t.id, t.name, t.playerID as 'captain', ut.playerID from user_team ut
-                left outer join team t on ut.teamID = t.id
-                where t.playerID not like '$id' and '$id' not in (select playerID from user_team_request where teamID like ut.teamID);";
+        $sql = "select id, name, playerID as 'captain' from team t
+                where '$id' not in (select playerID from user_team where teamID like t.id) and
+                        '$id' not in (select playerID from user_team_request where teamID like t.id);";
         try {
             $result = $this->connection->query($sql);
 
@@ -90,7 +90,7 @@ class TeamRepository
         }
     }
     function getTeams($id){
-        $sql = "select id, name, t.playerID as 'captain', user_team.playerID from user_team 
+        $sql = "select id, name, t.playerID as 'captain', user_team.playerID, imagePath from user_team 
                 join team t on user_team.teamID = t.id
                 where user_team.playerID like {$id};";
         try {
@@ -108,7 +108,7 @@ class TeamRepository
     }
 
     function getEvents($id){
-        $sql = "select id, teamID, type, description, date, time from event
+        $sql = "select id, teamID, type, description, date, time, duration, result, notions from event
                 where teamID like '{$id}';";
         try {
             $result = $this->connection->query($sql);
@@ -124,7 +124,7 @@ class TeamRepository
         }
     }
 
-    function addEvent($teamID, $type, $description, $date, $time, $duration){
+    function addEvent($teamID, $type, $description, $date, $time, $duration, $playerID){
         try {
             $sql = "insert into event (teamID, date, time, type, description, duration) values ('$teamID', '$date', '$time', '$type', '$description', '$duration')";
             mysqli_query($this->connection, $sql);
@@ -133,10 +133,74 @@ class TeamRepository
         }
     }
 
-    function getJoinRequests(){
-        $id = $_SESSION["userID"];
-        $sql = "select playerID, teamID, requestTime from user_team_request
-                where playerID like '$id';";
+    function updateEvent($eventID, $date, $time, $duration, $description, $result, $notions){
+        $sql = "update event set date = '$date', time = '$time', duration = '$duration', description = '$description', result = '$result', notions = '$notions' where id = '$eventID'";
+        try {
+            mysqli_query($this->connection, $sql);
+        } catch (mysqli_sql_exception $err) {
+            echo "SQL error occurred: " . $err->getMessage();
+        }
+    }
+
+    function deleteEvent($eventID){
+        $sql = "delete from event where id = '$eventID'";
+        try {
+            mysqli_query($this->connection, $sql);
+        } catch (mysqli_sql_exception $err) {
+            echo "SQL error occurred: " . $err->getMessage();
+        }
+    }
+
+    function getPlayersForEvent($id){
+        $sql = "select id, firstname, lastname from user_event
+                join user on id like user_event.playerID
+                where eventID like '$id';";
+        try {
+            $result = $this->connection->query($sql);
+
+            $rows = array();
+            while ($row = $result->fetch_assoc()) {
+                $rows[$row["id"]] = $row;
+            }
+
+            return $rows;
+        } catch (mysqli_sql_exception $err) {
+            echo "SQL error occurred: " . $err->getMessage();
+        }
+    }
+
+    function setPlayersToEvent($playerList, $eventID){
+        try {
+            $sql = "delete from user_event where eventID = '$eventID'";
+            mysqli_query($this->connection, $sql);
+
+            foreach ($playerList as &$value) {
+                $sql = "insert into user_event (eventID, playerID) values ('$eventID', '$value')";
+                mysqli_query($this->connection, $sql);
+            }
+        } catch (mysqli_sql_exception $err) {
+            echo "SQL error occurred: " . $err->getMessage();
+        }
+    }
+
+    function checkIfPlayerIsInEvent($playerID, $eventID){
+        $sql = "select * from user_event where playerID = '$playerID' and eventID = '$eventID'";
+        try {
+            $result = $this->connection->query($sql);
+            if ($result->num_rows == 0) {
+                return false;
+            } else {
+                return true;
+            }
+        } catch (mysqli_sql_exception $err) {
+            echo "SQL error occurred: " . $err->getMessage();
+        }
+    }
+
+    function getEventsThisMonth($playerID, $teamID, $month){
+        $sql = "select * from event e
+                join user_event on e.id = eventID
+                where playerID like '$playerID' and e.teamID like '$teamID' and extract(month from e.date) = '$month'";
         try {
             $result = $this->connection->query($sql);
 
@@ -191,8 +255,8 @@ class TeamRepository
         }
     }
 
-    function changeTeamName($oldTeamName, $newTeamName){
-        $sql = "update team set name = '$newTeamName' where name = '$oldTeamName'";
+    function changeTeamName($oldTeamName, $newTeamName, $imagePath){
+        $sql = "update team set name = '$newTeamName', imagePath = '$imagePath' where name = '$oldTeamName'";
         try {
             mysqli_query($this->connection, $sql);
         } catch (mysqli_sql_exception $err) {
@@ -224,6 +288,17 @@ class TeamRepository
             mysqli_query($this->connection, $sql2);
         } catch (mysqli_sql_exception $err) {
             echo "SQL error occurred: " . $err->getMessage();
+        }
+    }
+
+    function uploadTeamIcon($teamName){
+        if ($_FILES["image"]) {
+            $targetDirectory = "../img/";
+            $fileExtension = pathinfo($_FILES["image"]["name"], PATHINFO_EXTENSION);
+            $targetFile = $targetDirectory . "groupIcon_" . $teamName . "." . $fileExtension;
+            move_uploaded_file($_FILES["image"]["tmp_name"], $targetFile);
+
+            return $targetFile;
         }
     }
 

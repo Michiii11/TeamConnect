@@ -8,7 +8,9 @@
 }
 
 img {
+  border-radius: 50%;
   width: 100%;
+  aspect-ratio: 1/1;
   display: block;
 }
 
@@ -232,8 +234,11 @@ main aside.sidebar section.buttons div {
 main aside.sidebar section.buttons div:hover {
   color: #a6a6a6;
 }
-main aside.sidebar section.buttons div i {
-  padding-right: 0.5rem;
+main aside.sidebar section.buttons div i, main aside.sidebar section.buttons div img {
+  margin-right: 0.5rem;
+}
+main aside.sidebar section.buttons div img {
+  width: 1rem;
 }
 
 /*---------- notification ----------*/
@@ -403,7 +408,7 @@ main.login .backgroundImage {
   display: flex;
   flex-direction: column;
 }
-.userSettings .container {
+.userSettings .userContainer {
   width: 65%;
   margin-inline: auto;
   display: flex;
@@ -446,9 +451,13 @@ main.login .backgroundImage {
   margin-inline: 1rem;
   cursor: pointer;
 }
+.userSettings section.personal #file-upload-user {
+  display: none;
+}
 .userSettings section.personal img {
   cursor: pointer;
   width: 5rem;
+  height: 5rem;
   margin-right: 1rem;
 }
 .userSettings section.personal .first {
@@ -518,6 +527,9 @@ main.login .backgroundImage {
   margin-right: 1rem;
   width: 2rem;
 }
+.userSettings section.teams .section div #file-upload-team {
+  display: none;
+}
 .userSettings section.teams p {
   font-size: 1.2rem;
 }
@@ -585,9 +597,9 @@ main.login .backgroundImage {
   color: hsl(0, 0%, 90%);
   background-color: hsl(0, 0%, 18%);
 }
-.board .sections section.chat .messageBox i {
-  font-size: 1.5rem;
-  padding: 0.5rem 0.8rem 0 0.5rem;
+.board .sections section.chat .messageBox img {
+  width: 2.5rem;
+  margin: 0.3rem 0.8rem 0 0;
 }
 .board .sections section.chat .messageBox.isMyMessage {
   margin-left: auto;
@@ -678,6 +690,14 @@ main.login .backgroundImage {
 }
 
 /*---------- CalendarBox ----------*/
+.board section.calendar div.off {
+  display: none;
+}
+
+.board section.calendar button.off {
+  display: none;
+}
+
 .board section.calendar {
   display: flex;
   flex-direction: column;
@@ -685,10 +705,18 @@ main.login .backgroundImage {
 
 .board section.calendar .eventCalendar {
   display: grid;
+  margin-inline: 2rem;
+  text-align: center;
   width: 100%;
   height: 50%;
-  text-align: center;
   background-color: hsl(0, 0%, 15%);
+}
+.board section.calendar .eventCalendar .active {
+  background-color: hsl(0, 0%, 18%);
+  border-radius: 50%;
+}
+.board section.calendar .eventCalendar .proven {
+  text-decoration: underline;
 }
 
 .board section.calendar .eventListNav {
@@ -714,6 +742,18 @@ main.login .backgroundImage {
   font-weight: bold;
 }
 
+.board section.calendar .eventFull input, .board section.calendar .eventFull textarea {
+  background-color: transparent;
+  color: hsl(0, 0%, 90%);
+  border: none;
+  border-bottom: 1px solid hsl(0, 0%, 90%);
+}
+.board section.calendar .eventFull .buttons {
+  padding: 1rem;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
 .board section.calendar .eventFull .header {
   display: flex;
   flex-direction: row;
@@ -727,6 +767,7 @@ main.login .backgroundImage {
   margin-right: auto;
 }
 .board section.calendar .eventFull .header div {
+  text-align: center;
   margin-right: auto;
 }
 .board section.calendar .eventFull .description {
@@ -734,16 +775,24 @@ main.login .backgroundImage {
   border-bottom: 1px solid hsl(0, 0%, 90%);
 }
 .board section.calendar .eventFull .description p, .board section.calendar .eventFull .description label {
-  padding: 0.5rem 1rem;
   font-size: 1.2rem;
+}
+.board section.calendar .eventFull .description label {
+  display: flex;
+  align-items: center;
 }
 .board section.calendar .eventFull .description input, .board section.calendar .eventFull .description textarea {
   font-size: 1.2rem;
   margin: 0.5rem 1rem;
-  background-color: hsl(0, 0%, 20%);
-  color: hsl(0, 0%, 90%);
-  border: none;
-  border-bottom: 1px solid hsl(0, 0%, 90%);
+  padding: 0.2rem;
+}
+.board section.calendar .eventFull .description .erg {
+  width: 2rem;
+  text-align: center;
+}
+.board section.calendar .eventFull .description #duration {
+  width: 5rem;
+  text-align: center;
 }
 .board section.calendar .eventFull .playerSelect {
   padding: 1rem;
@@ -751,17 +800,85 @@ main.login .backgroundImage {
 }
 .board section.calendar .eventFull .playerSelect label#selectPlayer {
   font-size: 1.5rem;
-}
-.board section.calendar .eventFull .playerSelect input {
-  accent-color: hsl(123, 43%, 39%);
-  color-scheme: dark;
+  margin-bottom: 1.5rem;
 }
 .board section.calendar .eventFull .playerSelect div {
   display: flex;
   flex-direction: column;
 }
-.board section.calendar .eventFull .playerSelect div label, .board section.calendar .eventFull .playerSelect div input {
+.board section.calendar .eventFull .playerSelect div label {
   font-size: 1.2rem;
+}
+.board section.calendar .eventFull .gameStats {
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  font-size: 1.2rem;
+  border-bottom: 1px solid hsl(0, 0%, 90%);
+}
+.board section.calendar .eventFull .gameStats label {
+  margin-block: 1rem;
+  display: grid;
+  grid-template-columns: 0.5fr 1fr;
+}
+.board section.calendar .eventFull .gameStats input {
+  padding: 0.2rem;
+  margin-inline: 1rem;
+}
+.board section.calendar .eventFull .gameStats .dropdown {
+  display: flex;
+  align-items: flex-start;
+  position: relative;
+}
+.board section.calendar .eventFull .gameStats .dropdown-input {
+  padding: 0.3rem;
+  width: 10rem;
+  cursor: pointer;
+  border: none;
+  border-bottom: 1px solid hsl(0, 0%, 90%);
+}
+.board section.calendar .eventFull .gameStats .selected-members {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-left: 10px;
+}
+.board section.calendar .eventFull .gameStats .players {
+  display: flex;
+}
+.board section.calendar .eventFull .gameStats .selected-member {
+  display: flex;
+  align-items: center;
+  background-color: transparent;
+  padding: 2px 5px;
+  margin-right: 5px;
+  margin-bottom: 5px;
+}
+.board section.calendar .eventFull .gameStats .selected-member span {
+  margin-right: 5px;
+}
+.board section.calendar .eventFull .gameStats .selected-member button {
+  border: none;
+  background-color: transparent;
+  cursor: pointer;
+}
+.board section.calendar .eventFull .gameStats .dropdown-list {
+  display: none;
+  position: absolute;
+  width: 10rem;
+  max-height: 10rem;
+  overflow-y: auto;
+  border: 1px solid hsl(0, 0%, 90%);
+  background-color: hsl(0, 0%, 10%);
+  padding: 0.2rem;
+  z-index: 999;
+}
+.board section.calendar .eventFull .gameStats .dropdown-list-item {
+  cursor: pointer;
+  padding: 0.2rem;
+}
+.board section.calendar .eventFull .gameStats .dropdown-list-item:hover {
+  background-color: hsl(0, 0%, 15%);
 }
 
 .board section.calendar .eventList {
@@ -905,6 +1022,15 @@ main.login .backgroundImage {
   padding: 0.5rem;
   cursor: pointer;
   transition: 0.2s all;
+}
+.popUp.active .content > div img {
+  width: 5rem;
+  margin-block: 1rem;
+  cursor: pointer;
+}
+
+.file-upload-team {
+  display: none;
 }
 
 .popUp.logoutInfo p {
