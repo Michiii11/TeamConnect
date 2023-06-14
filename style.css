@@ -306,6 +306,30 @@ main aside.notification div.newNotification img {
   width: 2rem;
 }
 
+/*---------- new customer ----------*/
+.newCustomerPage {
+  display: none;
+  text-align: center;
+}
+.newCustomerPage.active {
+  display: flex;
+  flex-direction: column;
+  height: 80vh;
+  justify-content: center;
+}
+.newCustomerPage h2 {
+  font-size: 5rem;
+  color: hsl(123, 43%, 39%);
+}
+.newCustomerPage div {
+  display: flex;
+  justify-content: center;
+}
+.newCustomerPage div button {
+  margin: 1rem;
+  font-size: 2rem;
+}
+
 /*---------- Login ----------*/
 main.login {
   height: 100vh;
@@ -523,6 +547,7 @@ main.login .backgroundImage {
   display: none;
 }
 .userSettings section.teams .section div {
+  height: 5vh;
   padding: 1rem 0.5rem;
   border: 1px solid hsl(0, 0%, 90%);
   border-radius: 1rem;
@@ -949,8 +974,16 @@ main.login .backgroundImage {
   margin-bottom: 1rem;
 }
 .board section.calendar .eventList .newEventList select, .board section.calendar .eventList .newEventList option, .board section.calendar .eventList .newEventList input {
-  background-color: hsl(0, 0%, 18%);
+  background: hsl(0, 0%, 18%);
   color: hsl(0, 0%, 90%);
+  padding: 0.2rem;
+}
+.board section.calendar .eventList .newEventList div.selects, .board section.calendar .eventList .newEventList div.inputs {
+  display: grid;
+  grid-template-columns: 2fr 2fr 0.5fr;
+}
+.board section.calendar .eventList .newEventList div.selects.selects, .board section.calendar .eventList .newEventList div.inputs.selects {
+  grid-template-columns: 0.5fr 1fr;
 }
 
 /*---------- PopUp ----------*/
@@ -1105,6 +1138,9 @@ main.login .backgroundImage {
 /************ Keyframes ************/
 /************ Responsive ************/
 @media screen and (max-width: 1150px) { /*laptop*/
+  .newCustomerPage.active {
+    display: none;
+  }
   .userSettings {
     display: none !important;
   }
@@ -1116,7 +1152,6 @@ main.login .backgroundImage {
   }
   main aside {
     width: 50px;
-    position: absolute;
   }
   main aside section.teams h1 {
     display: none;

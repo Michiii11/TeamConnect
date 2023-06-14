@@ -147,8 +147,10 @@ class TeamRepository
 
     function deleteEvent($eventID){
         $sql = "delete from event where id = '$eventID'";
+        $sql2 = "delete from user_event where eventID = '$eventID'";
         try {
             mysqli_query($this->connection, $sql);
+            mysqli_query($this->connection, $sql2);
         } catch (mysqli_sql_exception $err) {
             echo "SQL error occurred: " . $err->getMessage();
         }
@@ -200,10 +202,10 @@ class TeamRepository
         }
     }
 
-    function setUserStatsToZero($list, $eventID){
+    function setUserStatsToZero($eventID){
         $types = ['goals', 'assists', 'yellow', 'red'];
         for($i = 0; $i < 4; $i++){
-            $sql = "update user_event set {$types[$i]} = '0' where eventID = '{$eventID}'";
+            $sql = "update user_event set $types[$i] = '0' where eventID = '{$eventID}'";
             try {
                 mysqli_query($this->connection, $sql);
             } catch (mysqli_sql_exception $err) {
@@ -212,7 +214,7 @@ class TeamRepository
         }
     }
     function updateStatsToEvent($list, $eventID){
-        $this->setUserStatsToZero($list, $eventID);
+        $this->setUserStatsToZero($eventID);
         for($i = 0; $i < count($list); $i++){
             $sql = "update user_event set {$list[$i]->type} = '{$list[$i]->count}' where playerID = '{$list[$i]->id}' and eventID = '{$eventID}'";
             try {
@@ -330,9 +332,15 @@ class TeamRepository
         $teamID = $this->getTeamByName($teamName);
         $sql = "delete from team where id = '$teamID'";
         $sql2 = "delete from user_team where teamID = '$teamID'";
+        $sql3 = "delete from user_event where teamID = '$teamID'";
+        $sql4 = "delete from user_team_request where teamID = '$teamID'";
+        $sql5 = "delete from chat where teamID = '$teamID'";
         try {
             mysqli_query($this->connection, $sql);
             mysqli_query($this->connection, $sql2);
+            mysqli_query($this->connection, $sql3);
+            mysqli_query($this->connection, $sql4);
+            mysqli_query($this->connection, $sql5);
         } catch (mysqli_sql_exception $err) {
             echo "SQL error occurred: " . $err->getMessage();
         }

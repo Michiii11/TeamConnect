@@ -13,6 +13,11 @@ PopupEngine.init()
 
 function updateDashboard(){
     if(amountOfTeams !== 0){
+        if(document.querySelector(".newCustomerPage").classList.contains("active")){
+            document.querySelector(".newCustomerPage").classList.remove("active")
+            document.querySelector(".board .sections").classList.add("active")
+        }
+
         getPlayers();
         getEvents();
         loadCalendarGrid();
@@ -27,8 +32,14 @@ function updateDashboard(){
         document.querySelector("#chatInputField").value = ""
         loadMessages()
     } else{
-        //todo area for new customers to set up a team
+        toggleNewCustomerPage()
     }
+}
+
+function toggleNewCustomerPage(){
+    document.querySelector(".newCustomerPage h2").innerHTML = `Hallo ${personalData.firstname}`
+    document.querySelector(".newCustomerPage").classList.add("active")
+    document.querySelector(".board .sections.active").classList.remove("active")
 }
 
 function updateTeams(){
@@ -244,7 +255,14 @@ function sendMessage(){
 
 /********* popup add team *********/
 //region
-function togglePopUp(){
+function togglePopUp(type){
+    if(type){
+        if(type !== 'create' || !document.querySelector(`.popUp.addTeam .${type}`).classList.contains("active")){
+            toggleTeamCreate()
+        }
+    }
+
+
     document.querySelector(".popUp.addTeam").classList.toggle("active");
     if(!document.querySelector(".popUp.addTeam.active")){
         document.querySelector(".error.create").innerHTML = ""
@@ -388,7 +406,6 @@ async function createTeam() {
                 return response.json()
             })
             .then((data) => {
-                console.log(data)
                 updateTeams();
                 togglePopUp();
             })
@@ -454,9 +471,9 @@ function toggleDetail(elem, playerID){
         .then((answer) => {
             let person = answer.data
             if(elem.classList.contains("detail")){
-                let goalPerGame = person.goals / person.games;
-                let assistPerGame = person.assists / person.games;
-                let scorerPerGame = person.scorer / person.games;
+                let goalPerGame = (person.goals / person.games).toFixed(2);
+                let assistPerGame = (person.assists / person.games).toFixed(2);
+                let scorerPerGame = (person.scorer / person.games).toFixed(2);
 
                 elem.innerHTML = `<div class="userIconName"><img src="${person.imagePath ? person.imagePath.substring(3) : 'img/userIcon.png'}" alt="userIcon"><h1>${person.firstname} ${person.lastname}</h1></div>
                 <div class="stats">
@@ -487,8 +504,8 @@ function toggleDetail(elem, playerID){
 /********* calendar box *********/
 //region
 function refreshEventSection(isStart){
-    loadCalendarGrid();
     getEvents();
+    loadCalendarGrid();
 
     if(!isStart){
         renderPlayersForEvent()
@@ -499,8 +516,8 @@ function loadCalendarGrid(){
     let month = new Date().getMonth();
     let today = new Date().getDate();
 
-    let monthNames = ["January", "February", "March", "April", "May", "June",
-        "July", "August", "September", "October", "November", "December"
+    let monthNames = ["Jänner", "Februar", "März", "April", "Mai", "Juni",
+        "Juli", "August", "September", "Oktober", "November", "Dezember"
     ];
     let monthDays = [31, 28 + isLeapYear(year), 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
 
@@ -516,7 +533,7 @@ function loadCalendarGrid(){
     }
 
     let monthHtml = "<table><tr><th colspan='7'>" + monthNames[month] + " " + year + "</th></tr>";
-    monthHtml += "<tr><th>Mon</th><th>Tue</th><th>Wed</th><th>Thu</th><th>Fri</th><th>Sat</th><th>Sun</th></tr><tr>";
+    monthHtml += "<tr><th>Mo</th><th>Di</th><th>Mi</th><th>Do</th><th>Fr</th><th>Sa</th><th>So</th></tr><tr>";
 
     let day = 1;
 
@@ -607,7 +624,7 @@ function filterEventList(elem, spezificDate){
     if(spezificDate) {
         elem.innerHTML = spezificDate
     } else{
-        document.querySelectorAll(".eventListNav p")[1].innerHTML = "Today"
+        document.querySelectorAll(".eventListNav p")[1].innerHTML = "Heute"
         document.querySelector(".eventCalendar .active").classList.remove("active")
         document.querySelectorAll(".eventCalendar button").forEach((elem) => {
             if(elem.innerHTML == new Date().getDate()){
@@ -640,13 +657,13 @@ async function renderEventList(data){
         let isCurrentItemIsTrue = false;
         let date = new Date(item.date);
 
-        if(filterType === "Upcoming" && date.getTime() >= Date.now()){
+        if(filterType === "Anstehend" && date.getTime() >= Date.now()){
             isCurrentItemIsTrue = true;
-        }else if(filterType === "Today" && isToday(date)){
+        }else if(filterType === "Heute" && isToday(date)){
             isCurrentItemIsTrue = true;
         } else if(document.querySelector(".eventListNav .active") && date.getDate() === (new Date(document.querySelector(".eventListNav .active").innerHTML)).getDate()) {
             isCurrentItemIsTrue = true;
-        } else if(filterType === "All"){
+        } else if(filterType === "Alle"){
             isCurrentItemIsTrue = true;
         }
 
@@ -714,15 +731,15 @@ function toggleNewEventField(){
                 <i class="fa-solid fa-futbol"></i>
             </div>
             <div>
-                <h4>
+                <div class="selects">
                     <select name="typeSelector" id="typeSelector" onchange="updateIconOnNewEventField()">
                         <option value="Fußballtraining">Fußballtraining</option>
                         <option value="Konditionstraining">Konditionstraining</option>
                         <option value="Spiel">Spiel</option>
                     </select>
                     <input type="text" id="descriptionInput" placeholder="Beschreibung">
-                </h4>
-                <p><input type="date" id="dateInput"><input type="time" id="timeInput"><input type="number" id="durationInput" placeholder="Dauer in h"></p>
+                </div>
+                <div class="inputs"><input type="date" id="dateInput"><input type="time" id="timeInput"><input type="number" id="durationInput" placeholder="Dauer in h"></div>
             </div>
             <div class="controls">
                 <i onclick="toggleNewEventField()" class="fa-solid fa-xmark"></i>
@@ -842,6 +859,7 @@ function updateEvent(type){
         })
     }
 
+    console.log(data)
     fetch(`./server/team.php/updateStatsToEvent?eventID=${currentEventID}`, {
         method: "POST", // or 'PUT'
         headers: {
@@ -853,7 +871,6 @@ function updateEvent(type){
             return response.json()
         })
         .then((data) => {
-            console.log(data)
         })
         .catch((error) => {
             console.error(`Error:`, error);
@@ -906,7 +923,9 @@ function toggleEvent(id, date, time, type, description, duration, result, notion
     document.querySelector(".eventListNav").classList.toggle("off")
     document.querySelector(".eventCalendar").classList.toggle("off")
     document.querySelector(".eventList").classList.toggle("off")
-    document.querySelector(".newButton").classList.toggle("off")
+    if(isCurrentTeamMyTeam){
+        document.querySelector(".newButton").classList.toggle("off")
+    }
     let eventFullHTML = document.querySelector(".eventFull")
     currentEventID = id
 
@@ -946,12 +965,16 @@ function toggleEvent(id, date, time, type, description, duration, result, notion
 
         ${type === "Spiel" ? renderGameStats() : ""}
         
-        <div class="buttons">
-            <button onclick="deleteEventInfo()" class="outlined">Delete</button>
-            <button onclick="updateEvent('${type}')" class="filled">Save</button>
-        </div>`
+        ${isCurrentTeamMyTeam ? `
+            <div class="buttons">
+                <button onclick="deleteEventInfo()" class="outlined">Delete</button>
+                <button onclick="updateEvent('${type}')" class="filled">Save</button>
+            </div>
+            ` : ""}`
 
-        loadStats();
+        if(type === "Spiel"){
+            loadStats();
+        }
     } else{
         eventFullHTML.innerHTML = ""
     }
@@ -1003,7 +1026,6 @@ function loadStats(){
             return response.json()
         })
         .then(answer=>{
-            console.log(answer)
             let types = ["goals", "assists", "yellow", "red"]
             for (let i = 0; i < types.length; i++) {
                 document.querySelector(`.${types[i]} .selected .selected-members`).innerHTML = ""
@@ -1011,13 +1033,14 @@ function loadStats(){
 
             for (const dataKey in answer.data) {
                 let curr = answer.data[dataKey]
-                console.log(curr)
                 let name = `${curr.firstname} ${curr.lastname}`
                 for (let i = 0; i < types.length; i++) {
                     if(curr[types[i]] != 0){
                         document.querySelector(`.${types[i]} .selected .selected-members`).innerHTML += `<div class="selected-member i${curr.id}"><span>${curr.firstname.charAt(0)}. ${curr.lastname}</span> <input type="number" class="count" id="count${name.replaceAll(" ", "")}" value="${curr[types[i]]}" onchange="checkIfNotNull(this)"></div>`
                     }
                 }
+                document.querySelector("input.dropdown-input").focus()
+                document.querySelector("input.dropdown-input").blur()
             }
         })
         .then(answer=> {
@@ -1254,7 +1277,6 @@ function updateNotifications(){
         .then((data) => {
             for (const dataKey in data.data) {
                 let curr = data.data[dataKey]
-                console.log(curr)
 
                 notificationField.innerHTML +=
                     `<div class="newNotification request r${curr.id}">
@@ -1368,9 +1390,9 @@ async function updatePersonalData() {
     let errorField = document.querySelector(".error.personal")
     errorField.innerHTML = "";
     if (personalData.firstname === "" || personalData.lastname === "" || personalData.email === "") {
-        errorField.innerHTML = "Firstname, Lastname and Email has to be filled"
+        errorField.innerHTML = "Vorname, Nachname und Email müssen ausgefüllt sein"
     } else if (!/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/.test(personalData.email)) {
-        errorField.innerHTML = "Invalid email address"
+        errorField.innerHTML = "Ungültige Email-Adresse"
     } else {
         fetch("./server/user.php/updatePersonalData", {
             method: "POST", // or 'PUT'
@@ -1577,7 +1599,6 @@ function changeTeamName(oldTeamName, newTeamName){
 let savedHTML = ""
 function quitOrDeleteTeamInfo(teamName){
     let teamBox = document.querySelector(`.teams .T${teamName.replaceAll(' ', "")}`)
-    console.log(teamName, teamName)
     if(savedHTML === ""){
         savedHTML = teamBox.innerHTML
         teamBox.innerHTML = `<p>${teamName} verlassen?</p>

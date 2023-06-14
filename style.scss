@@ -367,6 +367,35 @@ main aside.notification div.newNotification{
   }
 }
 
+/*---------- new customer ----------*/
+//region new customer
+.newCustomerPage{
+  display: none;
+
+  &.active{
+    display: flex;
+    flex-direction: column;
+    height: 80vh;
+    justify-content: center;
+  }
+  text-align: center;
+
+  h2{
+    font-size: 5rem;
+    color: $primary-main;
+  }
+
+  div{
+    display: flex;
+    justify-content: center;
+
+    button{
+      margin: 1rem;
+      font-size: 2rem;
+    }
+  }
+}
+
 /*---------- Login ----------*/
 //region login
 
@@ -635,6 +664,7 @@ main.login{
       }
 
       div{
+        height: 5vh;
         padding: 1rem .5rem;
         border: 1px solid $color-contrast;
         border-radius: 1rem;
@@ -1122,8 +1152,17 @@ main.login{
 
   .newEventList{
     select, option, input{
-      background-color: $gray-350;
+      background: $gray-350;
       color: $color-contrast;
+      padding: .2rem;
+    }
+    div.selects, div.inputs{
+      display: grid;
+      grid-template-columns: 2fr 2fr 0.5fr;
+
+      &.selects{
+        grid-template-columns: .5fr 1fr;
+      }
     }
     margin-bottom: 1rem;
   }
@@ -1318,7 +1357,11 @@ main.login{
 
 //region responsive
 @media screen and (max-width: 1150px) { /*laptop*/
-  .userSettings{
+  .newCustomerPage.active{
+    display: none;
+  }
+
+    .userSettings{
     display: none !important;
   }
 
@@ -1332,7 +1375,6 @@ main.login{
 
   main aside{
     width: 50px;
-    position: absolute;
 
     section.teams{
       h1{

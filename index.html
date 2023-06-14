@@ -117,8 +117,8 @@
                     </div>
 
                     <div class="buttons">
-                        <button class="outlined" onclick="updatePersonalData()"><span class="text">Save</span><i class="fa-solid fa-floppy-disk icon" title="Speichern" onclick="updatePersonalData()"></i></button>
-                        <button class="outlined" onclick="toggleLogoutInfo()"><span class="text">Log out</span><i class="fa-solid fa-right-from-bracket icon" title="Abmelden" onclick="toggleLogoutInfo()"></i></button>
+                        <button class="outlined" onclick="updatePersonalData()"><span class="text">Speichern</span></button>
+                        <button class="outlined" onclick="toggleLogoutInfo()"><span class="text">Ausloggen</span></button>
                         <p class="success personal"></p>
                         <p class="error personal"></p>
                     </div>
@@ -128,9 +128,9 @@
 
                 <section class="security">
                     <div>
-                        <input type="password" id="currPassword" placeholder="Password">
-                        <input type="password" id="newPassword" placeholder="New Password">
-                        <input type="password" id="repeatNewPassword" placeholder="Repeat Password">
+                        <input type="password" id="currPassword" placeholder="Passwort">
+                        <input type="password" id="newPassword" placeholder="Neues Passwort">
+                        <input type="password" id="repeatNewPassword" placeholder="Passwort wiederholen">
                         <button class="outlined" onclick="updatePassword()">Passwort Aktualisieren</button>
                     </div>
                     <p class="success security"></p>
@@ -143,6 +143,14 @@
                     <h3>Meine Teams</h3>
                     <div class="section"></div>
                 </section>
+            </div>
+        </div>
+
+        <div class="newCustomerPage">
+            <h2>Hallo Michael</h2>
+            <div>
+                <button class="outlined" onclick="togglePopUp('create')">Team erstellen</button>
+                <button class="outlined" onclick="togglePopUp('add')">Team hinzufügen</button>
             </div>
         </div>
 
@@ -164,9 +172,9 @@
                 <div class="eventFull"></div>
                 <div class="eventCalendar"></div>
                 <div class="eventListNav">
-                    <p class="active" onclick="filterEventList(this)">Upcoming</p>
-                    <p onclick="filterEventList(this)">Today</p>
-                    <p onclick="filterEventList(this)">All</p>
+                    <p class="active" onclick="filterEventList(this)">Anstehend</p>
+                    <p onclick="filterEventList(this)">Heute</p>
+                    <p onclick="filterEventList(this)">Alle</p>
                 </div>
                 <div class="eventList"></div>
 

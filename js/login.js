@@ -36,7 +36,7 @@ function confirm(){
                     window.location.replace(document.location.href.replace("/login.html", ""));
                 }
                 else{
-                    showError(["invalid mail or password entered"])
+                    showError(["Falsche Email oder Passwort eingegeben"])
                 }
             })
             .catch((error) => {
@@ -60,8 +60,7 @@ function confirm(){
             .then((data) => {
                 console.log(data, data.emailUsed);
                 if(data.emailUsed === true){
-                    console.log("ich bin drin");
-                    showError(["An account already exists with this email."])
+                    showError(["Es gibt bereits einen Account mit dieser Email"])
                 }
                 else if(data.loggedIn === true){
                     window.location.replace(document.location.href.replace("/login.html", ""));
@@ -81,27 +80,27 @@ function checkLogin(){
 
     if(page === "signin"){
         if(!/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/.test(inputs[0].value))//first has to be valid email
-            error.push("invalid email entered")
+            error.push("Ungültige Email Adresse")
         if(inputs[1].value === ""){
-            error.push("enter a password to continue")
+            error.push("Gib ein Passwort ein um weiter zu machen")
         }
     }
     else if(page === "signup"){
-        if(!/^[a-zA-Z0-9_-]+$/.test(inputs[0].value))//first has to be valid name
-            error.push("shelter name should only contain numbers letters and - _")
-        if(!/^[a-zA-Z0-9_-]+$/.test(inputs[1].value))//second has to be valid name
-            error.push("shelter name should only contain numbers letters and - _")
+        if(!/^[a-zA-Z]+$/.test(inputs[0].value))//first has to be valid name
+            error.push("Vorname ist nicht korrekt (darf nur aus Buchstaben bestehen)")
+        if(!/^[a-zA-Z]+$/.test(inputs[1].value))//second has to be valid name
+            error.push("Nachname ist nicht korrekt (darf nur aus Buchstaben bestehen)")
         if(!/[a-zA-Z0-9._%+-]+@[A-z0-9.-]+\.[A-z]{2,}/.test(inputs[2].value))//third has to be valid email
-            error.push("invalid email entered")
+            error.push("Ungültige Email Adresse")
 
         let validPassword = /(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+-=\[\]{}|;':",./<>?])[A-Za-z\d!@#$%^&*()_+-=\[\]{}|;':",./<>?]{8,}/
 
         if(!validPassword.test(inputs[3].value))
-            error.push(" password does not meet the requirements (2 special chars or numbers, lower and uppercase letters)")
+            error.push("Passwort ist nicht stark genug (2 Spezialzeichen oder Nummern, Klein- und Großbuchstaben)")
         else if(inputs[3].value.length < 8 || inputs[3].value.length > 100)
-            error.push(" password is too short or long (should be 8-100 chars)")
+            error.push("Passwort ist zu kurz oder zu lang (8-100 Zeichen)")
         else if(inputs[3].value !== inputs[4].value)
-            error.push(" passwords do not match")
+            error.push("Passwörter stimmen nicht überrein")
     }
 
     showError(error)
