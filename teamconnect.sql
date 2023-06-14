@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 5.2.0
+-- version 5.2.1
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Erstellungszeit: 11. Jun 2023 um 14:07
--- Server-Version: 10.4.27-MariaDB
--- PHP-Version: 8.2.0
+-- Erstellungszeit: 14. Jun 2023 um 15:03
+-- Server-Version: 10.4.28-MariaDB
+-- PHP-Version: 8.2.4
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -48,7 +48,8 @@ INSERT INTO `chat` (`id`, `teamID`, `userID`, `message`, `sendTime`) VALUES
 (6, 71, 8, 'testomatiko', '2023-06-09 19:39:18'),
 (7, 71, 8, 'hallo', '2023-06-09 19:44:02'),
 (8, 71, 9, 'hallo ich bin yanik jihu', '2023-06-09 19:49:20'),
-(9, 71, 8, 'Ich schicke diese Nachricht mit enter', '2023-06-09 19:53:57');
+(9, 71, 8, 'Ich schicke diese Nachricht mit enter', '2023-06-09 19:53:57'),
+(10, 71, 8, 'ich schreibe eine nachricht', '2023-06-14 07:14:53');
 
 -- --------------------------------------------------------
 
@@ -81,21 +82,6 @@ INSERT INTO `event` (`id`, `teamID`, `date`, `time`, `type`, `description`, `dur
 -- --------------------------------------------------------
 
 --
--- Tabellenstruktur für Tabelle `notifications`
---
-
-CREATE TABLE `notifications` (
-  `id` int(11) NOT NULL,
-  `userID` int(11) NOT NULL,
-  `chatID` int(11) NOT NULL,
-  `eventID` int(11) NOT NULL,
-  `teamID` int(11) NOT NULL,
-  `notiType` varchar(10) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
--- --------------------------------------------------------
-
---
 -- Tabellenstruktur für Tabelle `team`
 --
 
@@ -111,13 +97,13 @@ CREATE TABLE `team` (
 --
 
 INSERT INTO `team` (`id`, `playerID`, `name`, `imagePath`) VALUES
-(71, 8, 'michis team', '../img/groupIcon_michisteam.png'),
-(72, 8, 'lukis team', '../img/groupIcon_lukisteam.png'),
+(71, 8, 'michis team', '../img/groupIcon_michisteam.jpg'),
+(72, 8, 'lukis team', ''),
 (86, 9, 'yaniks team', ''),
-(108, 8, 'nielis team', '../img/groupIcon_nielisteam.png'),
 (119, 10, 'nielis superteam', ''),
-(138, 8, 'Langenstein', '../img/groupIcon_Langenstein.png'),
-(157, 8, 'test', '../img/groupIcon_test.png');
+(218, 8, 'letse', ''),
+(226, 8, 'das wars', ''),
+(243, 8, 'probe', '');
 
 -- --------------------------------------------------------
 
@@ -144,7 +130,7 @@ CREATE TABLE `user` (
 --
 
 INSERT INTO `user` (`id`, `firstname`, `lastname`, `email`, `password`, `position`, `health`, `rule`, `height`, `weight`, `imagePath`) VALUES
-(8, 'Michael', 'Leisch', 'michael.leisch@gmx.at', '$2y$10$D750CvJDZFfTrwVcfYDF8eO1FCCqb6.YCW8XpgHJHdScWr5Bx6.3a', 'RM', 'Gesund', '', 185, 75, '../img/userIcon_8.JPEG'),
+(8, 'Michael', 'Leisch', 'michael.leisch@gmx.at', '$2y$10$D750CvJDZFfTrwVcfYDF8eO1FCCqb6.YCW8XpgHJHdScWr5Bx6.3a', 'RM', 'Gesund', '', 185, 75, '../img/userIcon_8.jpg'),
 (9, 'Yanik', 'Kendler', 'yanik.kendler@gmail.com', '$2y$10$ngrt8eDQB6OT2trgoXE9duRb.VavmNL5DswlY.ooyh4TWfR4Buup.', 'TW', 'Gesund', '', 205, 85, ''),
 (10, 'Nieli', 'Nielpferd', 'nieli@nieli.pferd', '$2y$10$5RC83kyWu97K7/yWQnabxOoyS4KDDIeAWhGohDr.1ReGLYm404CXG', 'TW', 'Krank', '', 200, 1000, ''),
 (11, 'Lukas', 'Leisch', 'lukas.leisch@gmx.at', '$2y$10$rXv1L/qNZgYor4Skm76nw.d.MbAapCvVjcdBr.YzWfp/U5vVVMKu6', 'TW', 'Gesund', '', 0, 0, '');
@@ -158,31 +144,31 @@ INSERT INTO `user` (`id`, `firstname`, `lastname`, `email`, `password`, `positio
 CREATE TABLE `user_event` (
   `eventID` int(11) NOT NULL,
   `playerID` int(11) NOT NULL,
-  `goal` int(10) DEFAULT NULL,
-  `assist` int(10) DEFAULT NULL,
-  `yellowCard` int(10) NOT NULL,
-  `redCard` int(10) NOT NULL
+  `goals` int(10) NOT NULL,
+  `assists` int(10) NOT NULL,
+  `yellow` int(10) NOT NULL,
+  `red` int(10) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Daten für Tabelle `user_event`
 --
 
-INSERT INTO `user_event` (`eventID`, `playerID`, `goal`, `assist`, `yellowCard`, `redCard`) VALUES
-(33, 8, NULL, NULL, 0, 0),
-(35, 8, NULL, NULL, 0, 0),
-(35, 9, NULL, NULL, 0, 0),
-(35, 11, NULL, NULL, 0, 0),
-(37, 8, NULL, NULL, 0, 0),
-(37, 9, NULL, NULL, 0, 0),
-(37, 11, NULL, NULL, 0, 0),
-(38, 8, NULL, NULL, 0, 0),
-(39, 8, NULL, NULL, 0, 0),
-(39, 9, NULL, NULL, 0, 0),
-(39, 11, NULL, NULL, 0, 0),
-(40, 8, NULL, NULL, 0, 0),
-(40, 9, NULL, NULL, 0, 0),
-(40, 11, NULL, NULL, 0, 0);
+INSERT INTO `user_event` (`eventID`, `playerID`, `goals`, `assists`, `yellow`, `red`) VALUES
+(33, 8, 0, 0, 0, 0),
+(35, 8, 0, 0, 0, 0),
+(35, 9, 0, 0, 0, 0),
+(35, 11, 0, 0, 0, 0),
+(37, 8, 0, 0, 0, 0),
+(37, 9, 0, 0, 0, 0),
+(37, 11, 0, 0, 0, 0),
+(38, 8, 0, 0, 0, 0),
+(39, 8, 0, 0, 0, 0),
+(39, 9, 0, 0, 0, 0),
+(39, 11, 0, 0, 0, 0),
+(40, 8, 3, 1, 0, 0),
+(40, 9, 0, 0, 0, 0),
+(40, 11, 0, 0, 0, 0);
 
 -- --------------------------------------------------------
 
@@ -202,13 +188,12 @@ CREATE TABLE `user_team` (
 INSERT INTO `user_team` (`playerID`, `teamID`) VALUES
 (8, 71),
 (8, 72),
-(8, 108),
-(8, 138),
-(8, 157),
+(8, 218),
+(8, 226),
+(8, 243),
 (9, 71),
 (9, 72),
 (9, 86),
-(9, 108),
 (10, 119),
 (11, 71);
 
@@ -250,12 +235,6 @@ ALTER TABLE `event`
   ADD PRIMARY KEY (`id`);
 
 --
--- Indizes für die Tabelle `notifications`
---
-ALTER TABLE `notifications`
-  ADD PRIMARY KEY (`id`);
-
---
 -- Indizes für die Tabelle `team`
 --
 ALTER TABLE `team`
@@ -294,7 +273,7 @@ ALTER TABLE `user_team_request`
 -- AUTO_INCREMENT für Tabelle `chat`
 --
 ALTER TABLE `chat`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- AUTO_INCREMENT für Tabelle `event`
@@ -303,16 +282,10 @@ ALTER TABLE `event`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=41;
 
 --
--- AUTO_INCREMENT für Tabelle `notifications`
---
-ALTER TABLE `notifications`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-
---
 -- AUTO_INCREMENT für Tabelle `team`
 --
 ALTER TABLE `team`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=161;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=251;
 
 --
 -- AUTO_INCREMENT für Tabelle `user`
