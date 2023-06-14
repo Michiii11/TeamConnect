@@ -109,13 +109,16 @@ class TeamRepository
 
     function getEvents($id){
         $sql = "select id, teamID, type, description, date, time, duration, result, notions from event
-                where teamID like '{$id}';";
+                where teamID like '{$id}'
+                order by date, time desc;";
         try {
+            $idTemp = 0;
             $result = $this->connection->query($sql);
 
             $rows = array();
             while ($row = $result->fetch_assoc()) {
-                $rows[$row["id"]] = $row;
+                $rows["$idTemp"] = $row;
+                $idTemp++;
             }
 
             return $rows;
@@ -197,6 +200,47 @@ class TeamRepository
         }
     }
 
+    function setUserStatsToZero($list, $eventID){
+        $types = ['goals', 'assists', 'yellow', 'red'];
+        for($i = 0; $i < 4; $i++){
+            $sql = "update user_event set {$types[$i]} = '0' where eventID = '{$eventID}'";
+            try {
+                mysqli_query($this->connection, $sql);
+            } catch (mysqli_sql_exception $err) {
+                echo "SQL error occurred: " . $err->getMessage();
+            }
+        }
+    }
+    function updateStatsToEvent($list, $eventID){
+        $this->setUserStatsToZero($list, $eventID);
+        for($i = 0; $i < count($list); $i++){
+            $sql = "update user_event set {$list[$i]->type} = '{$list[$i]->count}' where playerID = '{$list[$i]->id}' and eventID = '{$eventID}'";
+            try {
+                mysqli_query($this->connection, $sql);
+            } catch (mysqli_sql_exception $err) {
+                echo "SQL error occurred: " . $err->getMessage();
+            }
+        }
+    }
+
+    function getStatsOfEvent($eventID){
+        $sql = "select playerID as id, firstname, lastname, goals, assists, yellow, red from user_event
+                join user on playerID = id
+                where eventID like '$eventID';";
+        try {
+            $result = $this->connection->query($sql);
+
+            $rows = array();
+            while ($row = $result->fetch_assoc()) {
+                $rows[$row["id"]] = $row;
+            }
+
+            return $rows;
+        } catch (mysqli_sql_exception $err) {
+            echo "SQL error occurred: " . $err->getMessage();
+        }
+    }
+
     function getEventsThisMonth($playerID, $teamID, $month){
         $sql = "select * from event e
                 join user_event on e.id = eventID
@@ -256,7 +300,10 @@ class TeamRepository
     }
 
     function changeTeamName($oldTeamName, $newTeamName, $imagePath){
-        $sql = "update team set name = '$newTeamName', imagePath = '$imagePath' where name = '$oldTeamName'";
+        $sql = "update team set name = '$newTeamName' where name = '$oldTeamName'";
+        if($imagePath){
+            $sql = "update team set name = '$newTeamName', imagePath = '$imagePath' where name = '$oldTeamName'";
+        }
         try {
             mysqli_query($this->connection, $sql);
         } catch (mysqli_sql_exception $err) {
@@ -293,13 +340,17 @@ class TeamRepository
 
     function uploadTeamIcon($teamName){
         if ($_FILES["image"]) {
-            $targetDirectory = "../img/";
-            $fileExtension = pathinfo($_FILES["image"]["name"], PATHINFO_EXTENSION);
-            $targetFile = $targetDirectory . "groupIcon_" . $teamName . "." . $fileExtension;
-            move_uploaded_file($_FILES["image"]["tmp_name"], $targetFile);
+            $imageFileType = pathinfo($_FILES["image"]["name"], PATHINFO_EXTENSION);
+            if($imageFileType === "jpg"){
+                $targetDirectory = "../img/";
+                $fileExtension = pathinfo($_FILES["image"]["name"], PATHINFO_EXTENSION);
+                $targetFile = $targetDirectory . "groupIcon_" . $teamName . "." . $fileExtension;
+                move_uploaded_file($_FILES["image"]["tmp_name"], $targetFile);
 
-            return $targetFile;
+                return $targetFile;
+            }
         }
+        return false;
     }
 
     //getters & setters

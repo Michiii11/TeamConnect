@@ -30,6 +30,7 @@ img{
   border-radius: 50%;
   width:100%;
   aspect-ratio: 1/1;
+  object-fit: cover;
   display: block;
 }
 
@@ -166,6 +167,10 @@ nav.login{
 /*---------- sidebar ----------*/
 //region aside
 
+.toggleAside{
+  display: none;
+}
+
 main aside.sidebar{
   display: flex;
   flex-direction: column;
@@ -283,6 +288,7 @@ main aside.sidebar section.buttons{
       margin-right: .5rem;
     }
     img{
+      border: 2px solid $color-contrast;
       width: 1rem;
     }
   }
@@ -479,7 +485,7 @@ main.login{
 .userSettings{
   display: none;
   width: 95%;
-  height: 90vh;
+  height: 85vh;
   margin-left: 2.5%;
   border: 1px solid $gray-500;
   border-radius: 1rem;
@@ -623,6 +629,7 @@ main.login{
       overflow: auto;
       -ms-overflow-style: none;
       scrollbar-width: none;
+      height: 20vh;
       &::-webkit-scrollbar{
         display: none;
       }
@@ -858,7 +865,7 @@ main.login{
   }
 
   .proven{
-    text-decoration: underline;
+    outline: 5px solid $gray-350;
   }
 }
 
@@ -873,6 +880,7 @@ main.login{
   border-left: none; border-right: none;
 
   p{
+    user-select: none;
     cursor: pointer;
     padding: .5rem;
     transition: .2s ease all;
@@ -887,15 +895,26 @@ main.login{
 }
 
 .board section.calendar .eventFull{
+  overflow: auto;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+  &::-webkit-scrollbar{
+    display: none;
+  }
+
   input, textarea{
-    background-color: transparent;
     color: $color-contrast;
+    font-size: 1rem;
+    background-color: $gray-350;
+    border-radius: .1rem;
+    text-align: left;
     border: none;
-    border-bottom: 1px solid $color-contrast;
+    border-bottom: .1rem solid $gray-550;
+    padding: .5rem;
   }
 
   .buttons{
-    padding: 1rem;
+    padding: 2rem;
     display: flex;
     flex-direction: row;
     justify-content: space-between;
@@ -906,7 +925,7 @@ main.login{
     flex-direction: row;
     align-items: center;
     padding: 1rem;
-    border-bottom: 1px solid $color-contrast;
+    background-color: $gray-350;
 
     i{
       font-size: 1.5rem;
@@ -920,8 +939,8 @@ main.login{
   }
 
   .description{
-    padding: 1rem;
-    border-bottom: 1px solid $color-contrast;
+    padding: 2rem;
+    border-bottom: 1px solid $gray-600;
 
     p, label{
       font-size: 1.2rem;
@@ -946,8 +965,8 @@ main.login{
   }
 
   .playerSelect{
-    padding: 1rem;
-    border-bottom: 1px solid $color-contrast;
+    padding: 2rem;
+    border-bottom: 1px solid $gray-600;
 
     label#selectPlayer{
       font-size: 1.5rem;
@@ -965,20 +984,16 @@ main.login{
   }
 
   .gameStats{
-    padding: 1rem;
+    padding: 2rem;
     display: flex;
     flex-direction: column;
     font-size: 1.2rem;
-    border-bottom: 1px solid $color-contrast;
+    border-bottom: 1px solid $gray-600;
 
     label{
-      margin-block: 1rem;
+      margin-block: .3rem;
       display: grid;
       grid-template-columns: .5fr 1fr;
-    }
-    input{
-      padding: .2rem;
-      margin-inline: 1rem;
     }
 
     .dropdown {
@@ -988,18 +1003,33 @@ main.login{
     }
 
     .dropdown-input {
+      margin-left: 1rem;
       padding: .3rem;
       width: 10rem;
       cursor: pointer;
       border: none;
-      border-bottom: 1px solid $color-contrast;
+
+      &:focus{
+        outline: 1px solid $color-contrast;
+      }
     }
 
-    .selected-members {
+    .selected {
       display: flex;
-      align-items: center;
       flex-wrap: wrap;
-      margin-left: 10px;
+      align-items: center;
+      background-color: $gray-350;
+      border-bottom: 1px solid $gray-600;
+      width: fit-content;
+      max-width: 100%;
+
+      div{
+        display: flex;
+      }
+    }
+
+    input.count{
+      width: 2rem;
     }
 
     .players{
@@ -1013,6 +1043,7 @@ main.login{
       padding: 2px 5px;
       margin-right: 5px;
       margin-bottom: 5px;
+      font-size: 1rem;
     }
 
     .selected-member span {
@@ -1031,18 +1062,22 @@ main.login{
       width: 10rem;
       max-height: 10rem;
       overflow-y: auto;
-      border: 1px solid $color-contrast;
-      background-color: $gray-200;
-      padding: .2rem;
+      border-top: none;
+      background-color: $gray-600;
+      box-shadow: 0 0 .5rem .5rem rgba(0, 0, 0, 0.3);
+      padding: .1rem;
+
       z-index: 999;
     }
 
     .dropdown-list-item {
       cursor: pointer;
       padding: .2rem;
+      background-color: $gray-300;
+      transition: all .1s ease;
 
       &:hover{
-        background-color: $gray-300;
+        background-color: $gray-400;
       }
     }
   }
@@ -1250,6 +1285,28 @@ main.login{
 .success {
   color: hsl(100, 100%, 64%);
 }
+
+.popupEngineModalButtons .popupEngineModalButton {
+  &:first-child{
+    background-color: transparent;
+    border: 1px solid $color-contrast;
+
+    &:hover{
+      background-color: $color-contrast;
+      color: $gray-100;
+      font-weight: bold;
+    }
+  }
+  &:last-child{
+    background-color: $primary-main;
+    color: $color-contrast;
+
+    &:hover{
+      background-color: $primary-dark;
+    }
+  }
+}
+
 //endregion
 
 /************ Imports ************/
@@ -1261,7 +1318,11 @@ main.login{
 
 //region responsive
 @media screen and (max-width: 1150px) { /*laptop*/
-  #login-container {
+  .userSettings{
+    display: none !important;
+  }
+
+    #login-container {
     width: 50vw;
 
     input {
@@ -1271,6 +1332,7 @@ main.login{
 
   main aside{
     width: 50px;
+    position: absolute;
 
     section.teams{
       h1{
@@ -1291,23 +1353,57 @@ main.login{
   }
 }
 
-@media screen and (max-width: 900px){ /*tablet*/
-  .board {
-    display: flex;
+@media screen and (max-width: 1050px){ /*tablet*/
+  body{
+    overflow: auto !important;
+  }
+  main aside.sidebar section.buttons{
+    flex-direction: row;
+    justify-content: space-evenly;
 
+    i{
+      font-size: 1.5rem;
+    }
+    div img{
+      width: 1.5rem;
+    }
+  }
+
+  .popUp.active .content > div{
+    width: 50vw;
+
+    input{
+      width: 100%;
+    }
+    .buttons{
+      margin-top: .5rem;
+      width: 100%;
+    }
+
+    .buttons button{
+      margin-block: 1rem;
+      width: fit-content;
+    }
+
+    .teamList{
+      width: 100%;
+    }
+  }
+
+
+  .board {
+    .sections{
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      height: fit-content;
+      overflow: auto;
+    }
     .sections section{
-      width: 60%;
-      height: 100%;
+      width: 80%;
+      margin-bottom: 2rem;
       border-radius: 1rem;
       box-shadow: .1rem .1rem .1rem $gray-500;
-      overflow: hidden;
-    }
-    section.player, section.calendar{
-      display: none;
-    }
-
-    section.chat .chatBox {
-      height: 77vh;
     }
   }
 
@@ -1326,6 +1422,54 @@ main.login{
 @media screen and (max-width: 600px) { /*phone*/
   #login-container{
     width: 90vw;
+  }
+
+  main aside.sidebar{
+    position: absolute;
+    z-index: 100;
+    width: 10vw;
+    min-width: 0;
+    padding: .5rem;
+    box-shadow: .5rem .5rem .5rem rgba(0, 0, 0, 0.42);
+    transition: all .3s;
+    height: fit-content;
+    .toggleAside{
+      display: grid;
+      place-content: center;
+      font-size: 1.2rem;
+      padding: .2rem;
+
+      .x{
+        display: none;
+      }
+    }
+
+    &:not(.active){
+      border-bottom-right-radius: .5rem;
+
+      .buttons, button, .content, hr{
+        display: none !important;
+      }
+    }
+
+    &.active{
+      height: 94dvh;
+      width: 35vw;
+
+      .toggleAside{
+        .x{
+          display: block;
+        }
+
+        .burger{
+          display: none;
+        }
+      }
+    }
+  }
+
+  .board .sections section{
+    width: 90%;
   }
 
   .board section{

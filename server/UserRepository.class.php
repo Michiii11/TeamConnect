@@ -162,9 +162,9 @@ class UserRepository
         }
     }
 
-    function getPlayerDetails($playerID, $teamID){//todo stats are for all teams summed, you should do it for teams separate
+    function getPlayerDetails($playerID){
         $sql = "select u.id as id, firstname, lastname, height, weight, position, health, imagePath,
-                nvl(sum(goal), 0) as goals, nvl(sum(assist), 0) as assists, nvl(sum(goal+assist), 0) as scorer, nvl(sum(yellowCard), 0) as yellow, nvl(sum(redCard), 0) as red,
+                nvl(sum(goals), 0) as goals, nvl(sum(assists), 0) as assists, nvl(sum(goals+assists), 0) as scorer, nvl(sum(yellow), 0) as yellow, nvl(sum(red), 0) as red,
                 (select count(e.id) from event e join user_event ue2 on e.id = ue2.eventID where ue2.playerID = u.id and e.type like 'Spiel') as games,
                 (select count(e.id) from event e join user_event ue2 on e.id = ue2.eventID where ue2.playerID = u.id and e.type not like 'Spiel') as trainings from user u
                 left outer join user_event ue on ue.playerID = u.id
@@ -176,8 +176,7 @@ class UserRepository
             if ($result->num_rows == 0) {
                 return false;
             } else {
-                $row = $result->fetch_assoc();
-                return $row;
+                return $result->fetch_assoc();
             }
         } catch (mysqli_sql_exception $err) {
             throw new Exception("SQL error occurred: " . $err->getMessage());
@@ -186,13 +185,17 @@ class UserRepository
 
     function uploadUserIcon(){
         if ($_FILES["image"]) {
-            $targetDirectory = "../img/";
-            $fileExtension = pathinfo($_FILES["image"]["name"], PATHINFO_EXTENSION);
-            $targetFile = $targetDirectory . "userIcon_" . $_SESSION['userID'] . "." . $fileExtension;
-            move_uploaded_file($_FILES["image"]["tmp_name"], $targetFile);
+            $imageFileType = pathinfo($_FILES["image"]["name"], PATHINFO_EXTENSION);
+            if($imageFileType == "jpg"){
+                $targetDirectory = "../img/";
+                $fileExtension = pathinfo($_FILES["image"]["name"], PATHINFO_EXTENSION);
+                $targetFile = $targetDirectory . "userIcon_" . $_SESSION['userID'] . "." . $fileExtension;
+                move_uploaded_file($_FILES["image"]["tmp_name"], $targetFile);
 
-            return $targetFile;
+                return $targetFile;
+            }
         }
+        return false;
     }
 
     //getters & setters

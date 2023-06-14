@@ -34,6 +34,8 @@ if (isset($_SESSION["loggedIn"]) && $_SESSION["loggedIn"]) {
         case "getPlayersForEvent": $response->data = $teams->getPlayersForEvent($postBody->eventID); break;
         case "setPlayersToEvent": $teams->setPlayersToEvent($postBody->playerList, $postBody->eventID); break;
         case "checkIfPlayerIsInEvent": $response->data = $teams->checkIfPlayerIsInEvent($_SESSION["userID"], $postBody->eventID); break;
+        case "updateStatsToEvent": $teams->updateStatsToEvent($postBody->list, $_GET["eventID"]); break;
+        case "getStatsToEvent": $response->data = $teams->getStatsOfEvent($_GET["eventID"]); break;
         case "getEventsThisMonth": $response->data = $teams->getEventsThisMonth($_SESSION["userID"], $postBody->teamID, $postBody->month); break;
         case "changeTeamName": $teams->changeTeamName($postBody->oldTeamName, $postBody->newTeamName, $postBody->imagePath);break;
         case "quitTeam": $teams->quitTeam($_SESSION["userID"], $postBody->teamName); break;

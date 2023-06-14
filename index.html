@@ -18,6 +18,8 @@
 </nav>
 <main>
     <aside class="sidebar">
+        <div class="toggleAside" onclick="toggleAside()"><i class="fa-solid fa-bars burger"></i><i class="fa-solid fa-xmark x"></i></div>
+
         <section class="teams">
             <h1>Meine Teams</h1>
             <i class="fa-sharp fa-solid fa-people-group"></i>
@@ -33,21 +35,6 @@
     </aside>
     <aside class="notification">
         <h1>Nachrichten</h1>
-<!--        <div class="newNotification message">
-            <img src="img/userIcon.png" alt="userIcon">
-            <p>Michael Leisch</p>
-            <p>Hat wer coole Idee für....</p>
-        </div>
-        <div class="newNotification event">
-            <img src="img/userIcon.png" alt="userIcon">
-            <p>Neues Event erstellt von Michael Leisch</p>
-            <p>Fußballtraining am 15.06 um 21:12</p>
-        </div>
-        <div class="newNotification event">
-            <img src="img/userIcon.png" alt="userIcon">
-            <p>Neues Event erstellt von Michael Leisch</p>
-            <p>Fußballtraining am 15.06 um 21:12</p>
-        </div>-->
     </aside>
 
     <div class="board">
@@ -72,7 +59,7 @@
                     <label for="file-upload-group" id="image-preview-group">
                         <img src="img/groupIcon.jpg" alt="groupIcon">
                     </label>
-                    <input style="display: none" type="file" id="file-upload-group" onchange="updateImage(this, 'group')" accept="image/png, image/jpeg">
+                    <input style="display: none" type="file" id="file-upload-group" onchange="updateImage(this, 'group')" accept="image/jpeg">
 
                     <input onkeydown="enterCreateTeam()" id="createTeamInput" type="text" placeholder="Teamname">
 
@@ -86,14 +73,6 @@
             </div>
         </div>
 
-        <div class="popUp logoutInfo">
-            <div class="content">
-                <h2>Abmelden</h2>
-                <p>Willst du dich wirklich ausloggen?</p>
-                <button class="outlined" onclick="logout()">Ja</button><button class="filled" onclick="toggleLogoutInfo()">Nein</button>
-            </div>
-        </div>
-
         <div class="userSettings">
             <div class="userContainer">
                 <section class="personal">
@@ -101,7 +80,7 @@
                         <label for="file-upload-user" id="image-preview-user">
                             <img src="img/userIcon.png" alt="userIcon">
                         </label>
-                        <input type="file" id="file-upload-user" onchange="updateImage(this, 'user')" accept="image/png, image/jpeg">
+                        <input type="file" id="file-upload-user" onchange="updateImage(this, 'user'); uploadUserIcon()" accept="image/jpeg">
                         <input type="text" id="firstname"><input type="text" id="lastname">
                     </div>
 

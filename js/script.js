@@ -9,6 +9,8 @@ let teamIconPath
 
 let currentEventID
 
+PopupEngine.init()
+
 function updateDashboard(){
     if(amountOfTeams !== 0){
         getPlayers();
@@ -21,7 +23,7 @@ function updateDashboard(){
             document.querySelector(".calendar button.newButton").classList.remove("off")
         }
 
-        document.querySelector("aside.sidebar .buttons img").src = curr.imagePath ? curr.imagePath.substring(3) : 'img/userIcon.png';
+        document.querySelector("aside.sidebar .buttons img").src = personalData.imagePath ? personalData.imagePath.substring(3) : 'img/userIcon.png';
         document.querySelector("#chatInputField").value = ""
         loadMessages()
     } else{
@@ -55,9 +57,12 @@ function checkLogin(){
             }
             else{
                 personalData = answer.personalData;
-
                 document.querySelector(".userName").innerHTML = personalData.firstname + " " + personalData.lastname;
                 updateDashboard()
+                if(sessionStorage["teamConnectIsSettingsOpen"] === "true"){
+                    sessionStorage["teamConnectIsSettingsOpen"] = "false"
+                    toggleUserSettings();
+                }
             }
         })
         .catch((error) => {
@@ -76,6 +81,8 @@ let hoverBox = document.querySelector(".hoverBox");
  * @param isHighlighted boolean: true = highlight, false = unhighlight
  */
 function highlightNavitem(elem, isHighlighted){
+    const mediaQuery = window.matchMedia('(min-width: 1050px)')
+
     if(isHighlighted){
         hoverBox.style.opacity= 0.3;
         let rect = elem.getBoundingClientRect();
@@ -369,7 +376,7 @@ async function createTeam() {
     await uploadTeamIcon(false, name.replaceAll(' ', ""))
 
     if (name.length >= 3) {
-        const data = {teamName: name, imagePath: teamIconPath};
+        const data = {teamName: name, imagePath: teamIconPath ? teamIconPath : ""};
         fetch("./server/team.php/createTeam", {
             method: "POST", // or 'PUT'
             headers: {
@@ -381,6 +388,7 @@ async function createTeam() {
                 return response.json()
             })
             .then((data) => {
+                console.log(data)
                 updateTeams();
                 togglePopUp();
             })
@@ -432,7 +440,7 @@ function renderPlayers(data){
 function toggleDetail(elem, playerID){
     elem.classList.toggle("detail")
 
-    let data = {playerID: playerID, teamID: currentTeamID}
+    let data = {playerID: playerID}
     fetch("./server/user.php/getPlayerDetails", {
         method: "POST", // or 'PUT'
         headers: {
@@ -612,7 +620,7 @@ function filterEventList(elem, spezificDate){
     getEvents();
 }
 
-function renderEventList(data){
+async function renderEventList(data){
     if(!localStorage.getItem("teamConnectEventFilter")){
         localStorage.setItem("teamConnectEventFilter", document.querySelector(".eventListNav .active").innerHTML)
     } else {
@@ -626,18 +634,9 @@ function renderEventList(data){
         })
     }
     let filterType = localStorage.getItem("teamConnectEventFilter")
-    let dataArray = []
 
-    for (const curr in data) {
-        dataArray.push(data[curr]);
-    }
-    dataArray.sort(function(a,b){
-        return new Date(a.date) - new Date(b.date);
-    });
-
-
-    document.querySelector(".board section.calendar .eventList").innerHTML = "";
-    Object.values(dataArray).forEach(item => {
+    let html = ""
+    for (const item of Object.values(data)) {
         let isCurrentItemIsTrue = false;
         let date = new Date(item.date);
 
@@ -652,10 +651,10 @@ function renderEventList(data){
         }
 
         if(isCurrentItemIsTrue){
-            checkIfPlayerIsInEvent(item.id)
+            await checkIfPlayerIsInEvent(item.id)
                 .then(isValidEvent => {
                     if (isValidEvent || isCurrentTeamMyTeam) {
-                        document.querySelector(".board section.calendar .eventList").innerHTML += renderEvent(item);
+                        html += renderEvent(item);
                     }
                 })
                 .catch(error => {
@@ -663,7 +662,9 @@ function renderEventList(data){
                     // Handle any errors that occurred during the fetch request
                 });
         }
-    });
+    }
+
+    document.querySelector(".board section.calendar .eventList").innerHTML = html
 }
 
 function renderEvent(item){
@@ -833,7 +834,30 @@ function updateEvent(type){
         });
 
     // stats section
+    let sections = ["goals", "assists", "yellow", "red"]
+    data = {list: []}
+    for (const sectionsKey in sections) {
+        document.querySelectorAll(`.${sections[sectionsKey]} .selected-member`).forEach((elem) => {
+            data.list.push({id: elem.classList[1].substring(1), count: elem.querySelector(".count").value, type: sections[sectionsKey]})
+        })
+    }
 
+    fetch(`./server/team.php/updateStatsToEvent?eventID=${currentEventID}`, {
+        method: "POST", // or 'PUT'
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+    })
+        .then((response) => {
+            return response.json()
+        })
+        .then((data) => {
+            console.log(data)
+        })
+        .catch((error) => {
+            console.error(`Error:`, error);
+        });
 
     toggleEvent();
     refreshEventSection(true);
@@ -860,8 +884,22 @@ function deleteEvent(){
         });
 }
 
-function deleteEventInfo(eventID){
-    //todo delte event info
+function deleteEventInfo(){
+    PopupEngine.createModal({
+        heading:"Event wirklich löschen?",
+        text: "_",
+        buttons: [
+            {
+                text: "Ja",
+                action: () => {deleteEvent()},
+                closePopup: true
+            },
+            {
+                text: "Nein",
+                closePopup: true
+            }
+        ]
+    })
 }
 
 function toggleEvent(id, date, time, type, description, duration, result, notions){
@@ -909,9 +947,11 @@ function toggleEvent(id, date, time, type, description, duration, result, notion
         ${type === "Spiel" ? renderGameStats() : ""}
         
         <div class="buttons">
-            <button onclick="deleteEvent()" class="outlined">Delete</button>
+            <button onclick="deleteEventInfo()" class="outlined">Delete</button>
             <button onclick="updateEvent('${type}')" class="filled">Save</button>
         </div>`
+
+        loadStats();
     } else{
         eventFullHTML.innerHTML = ""
     }
@@ -919,42 +959,83 @@ function toggleEvent(id, date, time, type, description, duration, result, notion
 
 function renderGameStats(){
     return `<div class="gameStats">
-        <label>Torschützen:
-            <div class="players">
+        <label>Torschützen:</label>
+        <div class="players goals">
+            <div class="selected">
                 <div class="selected-members"></div>
-                <input class="dropdown-input" type="text" placeholder="Spieler suchen" onclick="editPropertyDropdown('goal', this)">
+                <input class="dropdown-input" type="text" placeholder="Spieler suchen" onclick="editPropertyDropdown('goal', this, true)">
             </div>
             <div class="dropdown-list"></div>
-        </label>
+        </div>
         
-        <label>Assists:
-            <div class="players">
+        <label>Assists:</label>
+        <div class="players assists">
+            <div class="selected">
                 <div class="selected-members"></div>
-                <input class="dropdown-input" type="text" placeholder="Spieler suchen" onclick="editPropertyDropdown('assist', this)">
+                <input class="dropdown-input" type="text" placeholder="Spieler suchen" onclick="editPropertyDropdown('assist', this, true)">
             </div>
             <div class="dropdown-list"></div>
-        </label>
+        </div>
    
-        <label>Gelbe Karten:
-            <div class="players">
+        <label>Gelbe Karten:</label>
+        <div class="players yellow">
+            <div class="selected">
                 <div class="selected-members"></div>
-                <input class="dropdown-input" type="text" placeholder="Spieler suchen" onclick="editPropertyDropdown('yellow', this)">
+                <input class="dropdown-input" type="text" placeholder="Spieler suchen" onclick="editPropertyDropdown('yellow', this, true)">
             </div>
             <div class="dropdown-list"></div>
-        </label>
+        </div>
         
-        <label>Rote Karten:
-            <div class="players">
+        <label>Rote Karten:</label>
+        <div class="players red">
+            <div class="selected">
                 <div class="selected-members"></div>
-                <input class="dropdown-input" type="text" placeholder="Spieler suchen" onclick="editPropertyDropdown('red', this)">
+                <input class="dropdown-input" type="text" placeholder="Spieler suchen" onclick="editPropertyDropdown('red', this, true)">
             </div>
             <div class="dropdown-list"></div>
-        </label>
+        </div>
     </div>`
 }
 
+function loadStats(){
+    fetch(`./server/team.php/getStatsToEvent?eventID=${currentEventID}`)
+        .then((response) => {
+            return response.json()
+        })
+        .then(answer=>{
+            console.log(answer)
+            let types = ["goals", "assists", "yellow", "red"]
+            for (let i = 0; i < types.length; i++) {
+                document.querySelector(`.${types[i]} .selected .selected-members`).innerHTML = ""
+            }
+
+            for (const dataKey in answer.data) {
+                let curr = answer.data[dataKey]
+                console.log(curr)
+                let name = `${curr.firstname} ${curr.lastname}`
+                for (let i = 0; i < types.length; i++) {
+                    if(curr[types[i]] != 0){
+                        document.querySelector(`.${types[i]} .selected .selected-members`).innerHTML += `<div class="selected-member i${curr.id}"><span>${curr.firstname.charAt(0)}. ${curr.lastname}</span> <input type="number" class="count" id="count${name.replaceAll(" ", "")}" value="${curr[types[i]]}" onchange="checkIfNotNull(this)"></div>`
+                    }
+                }
+            }
+        })
+        .then(answer=> {
+        })
+        .catch((error) => {
+            console.error("Error:", error);
+        });
+}
+
 let playersForCurrentEvent = []
-function editPropertyDropdown(prop, elem){
+let clickedElem;
+let editPopup;
+let currentProp;
+function editPropertyDropdown(prop, elem, isFirst){
+    clickedElem = elem
+    currentProp = prop
+    document.body.addEventListener('click', closePropertyDropdown);
+
     playersForCurrentEvent = []
     let players = []
     document.querySelectorAll(".playerList label").forEach((elem) => {
@@ -964,65 +1045,99 @@ function editPropertyDropdown(prop, elem){
         }
     })
 
-    let doubleParent = elem.parentElement.parentElement
+    let doubleParent = elem.closest(".players")
     let list = doubleParent.querySelector(".dropdown-list")
     let inputs = document.querySelectorAll("input.dropdown-input")
 
-    elem.addEventListener('input', () => {
-        const enteredText = elem.value.trim();
-        let filteredMembers = players.filter(player => player.toLowerCase().includes(enteredText.toLowerCase()));
+    if(isFirst){
+        elem.addEventListener('input', () => {
+            const enteredText = elem.value.trim();
+            let filteredMembers = players.filter(player => player.toLowerCase().includes(enteredText.toLowerCase()));
 
-        list.innerHTML = ''; // Leere die Liste
+            list.innerHTML = '';
 
-        // Erzeuge eine Option für jedes gefilterte Mitglied
-        filteredMembers.forEach(member => {
-            const listItem = document.createElement('div');
-            listItem.textContent = member;
-            listItem.classList.add('dropdown-list-item');
-            list.appendChild(listItem);
+            filteredMembers.forEach(member => {
+                const listItem = document.createElement('p');
+                listItem.textContent = member;
+                listItem.classList.add(`dropdown-list-item`);
+
+                for(let i = 0; i < playersForCurrentEvent.length; i++){
+                    if(listItem.innerHTML === playersForCurrentEvent[i].name){
+                        listItem.classList.add(`i${playersForCurrentEvent[i].id}`);
+                    }
+                }
+                list.appendChild(listItem);
+            });
         });
-    });
 
-    elem.addEventListener("keydown", function(event) {
-        if (event.keyCode === 13) {
-            confirmPropertyDropdown(elem, prop)
-        }
-    });
-
-    inputs.forEach((elem) => {
-        elem.addEventListener('blur', () => {
-            closePropertyDropdown()
+        elem.addEventListener("keydown", function(event) {
+            if (event.keyCode === 13) {
+                confirmPropertyDropdown(elem, prop)
+            }
         });
-    })
+    }
+
 
     //position popup
-    let editPopup = elem.parentElement.parentElement.querySelector(".dropdown-list")
+    editPopup = elem.closest(".players").querySelector(".dropdown-list")
     let rect = elem.getBoundingClientRect()
     editPopup.style.top = rect.top - document.querySelector("nav").clientHeight + rect.height + "px"
     editPopup.style.left = rect.left - document.querySelector("aside").clientWidth + "px"
 
     let html = "";
     Object.entries(playersForCurrentEvent).forEach(item => {
-        html += `<p class="dropdown-list-item" onclick="confirmPropertyDropdown(this, '${prop}', '${item[1].id}', '${item[1].name}')">${item[1].name}</p>`
+        html += `<p class="dropdown-list-item i${item[1].id}" onclick="confirmPropertyDropdown(this, '${prop}', '${item[1].name}')">${item[1].name}</p>`
     })
 
     doubleParent.querySelector(".dropdown-list").innerHTML = html;
     doubleParent.querySelector(".dropdown-list").style.display = "block";
 }
 
-function closePropertyDropdown(event){
-/*    document.querySelectorAll(".dropdown-list").forEach((elem) => {
-        elem.style.display = "none"
-    });*/
+function toggleAside(){
+    document.querySelector("main aside").classList.toggle("active")
 }
 
-function confirmPropertyDropdown(elem, prop, ID, name){
-    if(!ID && !name){
-        name = elem.parentElement.parentElement.querySelectorAll(".dropdown-list div")[0].innerHTML
+function closePropertyDropdown(event){
+    if(!editPopup.contains(event.target) && !clickedElem.contains(event.target)) {
+        editPopup.style.display = "none"
     }
-    setTimeout(() => {
-        elem.parentElement.parentElement.querySelector(".selected-members").innerHTML += `<span>${name}</span>`
-    }, 1000)
+}
+function checkIfNotNull(elem){
+    if(elem.value === "0"){
+        elem.closest(".selected-member").remove()
+        editPropertyDropdown(null, elem)
+    }
+}
+function confirmPropertyDropdown(elem, prop, name){
+    document.body.removeEventListener('click', closePropertyDropdown);
+
+    let id;
+    if(!name){
+        name = elem.closest(".players").querySelector(".dropdown-list p").innerHTML
+        id = elem.closest(".players").querySelector(".dropdown-list p").classList[1]
+    } else{
+        id = elem.classList[1]
+    }
+
+    let isAlreadyUsed = false
+
+    elem.closest(".players").querySelectorAll(".selected-members div").forEach((elem) => {
+        let splitName = name.split(" ");
+        if (elem.querySelector("span").innerHTML === `${splitName[0].charAt(0)}. ${splitName[1]}`) {
+            isAlreadyUsed = true;
+            document.querySelector(`#count${name.replaceAll(" ", "")}`).value ++;
+        }
+    })
+
+    if(!isAlreadyUsed){
+        let splitName = name.split(" ");
+        elem.closest(".players").querySelector(".selected-members").innerHTML += `<div class="selected-member ${id}"><span>${splitName[0].charAt(0)}. ${splitName[1]}</span> <input type="number" class="count" id="count${name.replaceAll(" ", "")}" value="1" onchange="checkIfNotNull(this)"></div>`
+    }
+    if(elem.closest(".players").querySelector("input.dropdown-input")){
+        elem.closest(".players").querySelector("input.dropdown-input").value = ""
+    }
+
+    editPopup.style.display = "none"
 }
 
 function renderPlayersForEvent(){
@@ -1225,6 +1340,7 @@ function toggleUserSettings(){
     document.querySelector(".board .sections").classList.toggle("active")
     updatePersonalDataInputs();
     updateTeams();
+    sessionStorage["teamConnectIsSettingsOpen"] = sessionStorage["teamConnectIsSettingsOpen"] === "false";
 }
 
 function updatePersonalDataInputs(){
@@ -1234,9 +1350,9 @@ function updatePersonalDataInputs(){
         }
     }
 
-    if(document.querySelector("#image-preview img")){
-        document.querySelector("#image-preview img").src = personalData.imagePath.substring(3);
-        document.querySelector("aside.sidebar .buttons img").src = personalData.imagePath.substring(3);
+    if(document.querySelector("#image-preview-user img")){
+        document.querySelector("#image-preview-user img").src = personalData.imagePath ? personalData.imagePath.substring(3) : 'img/userIcon.png';
+        document.querySelector("aside.sidebar .buttons img").src = personalData.imagePath ? personalData.imagePath.substring(3) : 'img/userIcon.jpg';
     }
 }
 
@@ -1269,7 +1385,12 @@ async function updatePersonalData() {
             .then((data) => {
                 document.querySelector(".success.personal").innerHTML = "Persönliche Daten wurden erfolgreich geändert"
                 clearSuccessErrorAfterPeriod(3);
-                document.querySelector(".userName").innerHTML = personalData.firstname + " " + personalData.lastname;
+                document.querySelector(".userName").innerHTML = personalData.firstname + " " + personalData.lastname
+            })
+            .then(() => {
+                setTimeout(() => {
+                    location.reload()
+                }, 500)
             })
             .catch((error) => {
                 document.querySelector(".error.personal").innerHTML = "Es gab einen Fehler beim Speichern der Daten"
@@ -1342,7 +1463,21 @@ function updatePassword(){
 }
 
 function toggleLogoutInfo(){
-    document.querySelector(".popUp.logoutInfo").classList.toggle("active");
+    PopupEngine.createModal({
+        text:"Willst du dich wirklich ausloggen?",
+        heading:"Abmelden",
+        buttons: [
+            {
+                text: "Ja",
+                action: () => {logout()},
+                closePopup: true
+            },
+            {
+                text: "Nein",
+                closePopup: true
+            }
+        ]
+    })
 }
 
 function logout(){
@@ -1379,9 +1514,9 @@ function updateTeamList(){
                 html += `
                     <div class='.teams T${item.name.replaceAll(' ', "")}'>
                         <label for="file-upload-${item.name.replaceAll(' ', "")}" id="image-preview-${item.name.replaceAll(' ', "")}">
-                            <img src="${item.imagePath ? item.imagePath.substring(3) : 'img/userIcon.png'}" alt="userIcon">
+                            <img src="${item.imagePath ? item.imagePath.substring(3) : 'img/groupIcon.jpg'}" alt="userIcon">
                         </label>
-                        <input class="file-upload-team" disabled type="file" id="file-upload-${item.name.replaceAll(' ', "")}" onchange="updateImage(this, '${item.name.replaceAll(' ', "")}')" accept="image/png, image/jpeg">
+                        <input class="file-upload-team" disabled type="file" id="file-upload-${item.name.replaceAll(' ', "")}" onchange="updateImage(this, '${item.name.replaceAll(' ', "")}'); uploadTeamIcon(true, '${item.name.replaceAll(' ', "")}')" accept="image/jpeg">
                         
                         <p>${item.name}</p>
                         <div class="edit">
@@ -1418,7 +1553,7 @@ async function changeTeamViewToEdit(teamName){
 function changeTeamName(oldTeamName, newTeamName){
     let teamBox = document.querySelector(`.teams .T${oldTeamName.replaceAll(' ', "")} p`)
 
-    const data = {oldTeamName: oldTeamName, newTeamName: newTeamName, imagePath: teamIconPath};
+    const data = {oldTeamName: oldTeamName, newTeamName: newTeamName, imagePath: teamIconPath ? teamIconPath : ""};
     fetch("./server/team.php/changeTeamName", {
         method: "POST", // or 'PUT'
         headers: {
@@ -1442,10 +1577,11 @@ function changeTeamName(oldTeamName, newTeamName){
 let savedHTML = ""
 function quitOrDeleteTeamInfo(teamName){
     let teamBox = document.querySelector(`.teams .T${teamName.replaceAll(' ', "")}`)
+    console.log(teamName, teamName)
     if(savedHTML === ""){
         savedHTML = teamBox.innerHTML
-        teamBox.innerHTML = `<p>Möchtest du ${teamName} wirklich verlassen</p>
-            <button class="filled" onclick="quitOrDeleteTeamInfo('${teamName}')">Nein</button>
+        teamBox.innerHTML = `<p>${teamName} verlassen?</p>
+            <button style="margin-left: auto; margin-right: 1rem;" class="filled" onclick="quitOrDeleteTeamInfo('${teamName}')">Nein</button>
             <button class="outlined" onclick="deleteTeam('${teamName}')">Ja</button>`
     } else{
         teamBox.innerHTML = savedHTML
@@ -1453,6 +1589,7 @@ function quitOrDeleteTeamInfo(teamName){
     }
 }
 function deleteTeam(teamName){
+    savedHTML = ""
     const data = {teamName: teamName};
     fetch("./server/team.php/quitTeam", {
         method: "POST", // or 'PUT'
@@ -1463,6 +1600,7 @@ function deleteTeam(teamName){
     })
         .then((response) => {
             updateTeams();
+            updateTeamList()
         })
         .catch((error) => {
             console.error(`Error:`, error);

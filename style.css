@@ -11,6 +11,7 @@ img {
   border-radius: 50%;
   width: 100%;
   aspect-ratio: 1/1;
+  object-fit: cover;
   display: block;
 }
 
@@ -129,6 +130,10 @@ nav.login {
 }
 
 /*---------- sidebar ----------*/
+.toggleAside {
+  display: none;
+}
+
 main aside.sidebar {
   display: flex;
   flex-direction: column;
@@ -238,6 +243,7 @@ main aside.sidebar section.buttons div i, main aside.sidebar section.buttons div
   margin-right: 0.5rem;
 }
 main aside.sidebar section.buttons div img {
+  border: 2px solid hsl(0, 0%, 90%);
   width: 1rem;
 }
 
@@ -396,7 +402,7 @@ main.login .backgroundImage {
 .userSettings {
   display: none;
   width: 95%;
-  height: 90vh;
+  height: 85vh;
   margin-left: 2.5%;
   border: 1px solid hsl(0, 0%, 25%);
   border-radius: 1rem;
@@ -511,6 +517,7 @@ main.login .backgroundImage {
   overflow: auto;
   -ms-overflow-style: none;
   scrollbar-width: none;
+  height: 20vh;
 }
 .userSettings section.teams .section::-webkit-scrollbar {
   display: none;
@@ -716,7 +723,7 @@ main.login .backgroundImage {
   border-radius: 50%;
 }
 .board section.calendar .eventCalendar .proven {
-  text-decoration: underline;
+  outline: 5px solid hsl(0, 0%, 18%);
 }
 
 .board section.calendar .eventListNav {
@@ -731,6 +738,7 @@ main.login .backgroundImage {
   border-right: none;
 }
 .board section.calendar .eventListNav p {
+  user-select: none;
   cursor: pointer;
   padding: 0.5rem;
   transition: 0.2s ease all;
@@ -742,14 +750,26 @@ main.login .backgroundImage {
   font-weight: bold;
 }
 
+.board section.calendar .eventFull {
+  overflow: auto;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.board section.calendar .eventFull::-webkit-scrollbar {
+  display: none;
+}
 .board section.calendar .eventFull input, .board section.calendar .eventFull textarea {
-  background-color: transparent;
   color: hsl(0, 0%, 90%);
+  font-size: 1rem;
+  background-color: hsl(0, 0%, 18%);
+  border-radius: 0.1rem;
+  text-align: left;
   border: none;
-  border-bottom: 1px solid hsl(0, 0%, 90%);
+  border-bottom: 0.1rem solid hsl(0, 0%, 28%);
+  padding: 0.5rem;
 }
 .board section.calendar .eventFull .buttons {
-  padding: 1rem;
+  padding: 2rem;
   display: flex;
   flex-direction: row;
   justify-content: space-between;
@@ -759,7 +779,7 @@ main.login .backgroundImage {
   flex-direction: row;
   align-items: center;
   padding: 1rem;
-  border-bottom: 1px solid hsl(0, 0%, 90%);
+  background-color: hsl(0, 0%, 18%);
 }
 .board section.calendar .eventFull .header i {
   font-size: 1.5rem;
@@ -771,8 +791,8 @@ main.login .backgroundImage {
   margin-right: auto;
 }
 .board section.calendar .eventFull .description {
-  padding: 1rem;
-  border-bottom: 1px solid hsl(0, 0%, 90%);
+  padding: 2rem;
+  border-bottom: 1px solid hsl(0, 0%, 30%);
 }
 .board section.calendar .eventFull .description p, .board section.calendar .eventFull .description label {
   font-size: 1.2rem;
@@ -795,8 +815,8 @@ main.login .backgroundImage {
   text-align: center;
 }
 .board section.calendar .eventFull .playerSelect {
-  padding: 1rem;
-  border-bottom: 1px solid hsl(0, 0%, 90%);
+  padding: 2rem;
+  border-bottom: 1px solid hsl(0, 0%, 30%);
 }
 .board section.calendar .eventFull .playerSelect label#selectPlayer {
   font-size: 1.5rem;
@@ -810,20 +830,16 @@ main.login .backgroundImage {
   font-size: 1.2rem;
 }
 .board section.calendar .eventFull .gameStats {
-  padding: 1rem;
+  padding: 2rem;
   display: flex;
   flex-direction: column;
   font-size: 1.2rem;
-  border-bottom: 1px solid hsl(0, 0%, 90%);
+  border-bottom: 1px solid hsl(0, 0%, 30%);
 }
 .board section.calendar .eventFull .gameStats label {
-  margin-block: 1rem;
+  margin-block: 0.3rem;
   display: grid;
   grid-template-columns: 0.5fr 1fr;
-}
-.board section.calendar .eventFull .gameStats input {
-  padding: 0.2rem;
-  margin-inline: 1rem;
 }
 .board section.calendar .eventFull .gameStats .dropdown {
   display: flex;
@@ -831,17 +847,29 @@ main.login .backgroundImage {
   position: relative;
 }
 .board section.calendar .eventFull .gameStats .dropdown-input {
+  margin-left: 1rem;
   padding: 0.3rem;
   width: 10rem;
   cursor: pointer;
   border: none;
-  border-bottom: 1px solid hsl(0, 0%, 90%);
 }
-.board section.calendar .eventFull .gameStats .selected-members {
+.board section.calendar .eventFull .gameStats .dropdown-input:focus {
+  outline: 1px solid hsl(0, 0%, 90%);
+}
+.board section.calendar .eventFull .gameStats .selected {
   display: flex;
-  align-items: center;
   flex-wrap: wrap;
-  margin-left: 10px;
+  align-items: center;
+  background-color: hsl(0, 0%, 18%);
+  border-bottom: 1px solid hsl(0, 0%, 30%);
+  width: fit-content;
+  max-width: 100%;
+}
+.board section.calendar .eventFull .gameStats .selected div {
+  display: flex;
+}
+.board section.calendar .eventFull .gameStats input.count {
+  width: 2rem;
 }
 .board section.calendar .eventFull .gameStats .players {
   display: flex;
@@ -853,6 +881,7 @@ main.login .backgroundImage {
   padding: 2px 5px;
   margin-right: 5px;
   margin-bottom: 5px;
+  font-size: 1rem;
 }
 .board section.calendar .eventFull .gameStats .selected-member span {
   margin-right: 5px;
@@ -868,17 +897,20 @@ main.login .backgroundImage {
   width: 10rem;
   max-height: 10rem;
   overflow-y: auto;
-  border: 1px solid hsl(0, 0%, 90%);
-  background-color: hsl(0, 0%, 10%);
-  padding: 0.2rem;
+  border-top: none;
+  background-color: hsl(0, 0%, 30%);
+  box-shadow: 0 0 0.5rem 0.5rem rgba(0, 0, 0, 0.3);
+  padding: 0.1rem;
   z-index: 999;
 }
 .board section.calendar .eventFull .gameStats .dropdown-list-item {
   cursor: pointer;
   padding: 0.2rem;
+  background-color: hsl(0, 0%, 15%);
+  transition: all 0.1s ease;
 }
 .board section.calendar .eventFull .gameStats .dropdown-list-item:hover {
-  background-color: hsl(0, 0%, 15%);
+  background-color: hsl(0, 0%, 20%);
 }
 
 .board section.calendar .eventList {
@@ -1052,10 +1084,30 @@ main.login .backgroundImage {
   color: hsl(100, 100%, 64%);
 }
 
+.popupEngineModalButtons .popupEngineModalButton:first-child {
+  background-color: transparent;
+  border: 1px solid hsl(0, 0%, 90%);
+}
+.popupEngineModalButtons .popupEngineModalButton:first-child:hover {
+  background-color: hsl(0, 0%, 90%);
+  color: hsl(0, 0%, 5%);
+  font-weight: bold;
+}
+.popupEngineModalButtons .popupEngineModalButton:last-child {
+  background-color: hsl(123, 43%, 39%);
+  color: hsl(0, 0%, 90%);
+}
+.popupEngineModalButtons .popupEngineModalButton:last-child:hover {
+  background-color: hsl(123, 43%, 27%);
+}
+
 /************ Imports ************/
 /************ Keyframes ************/
 /************ Responsive ************/
 @media screen and (max-width: 1150px) { /*laptop*/
+  .userSettings {
+    display: none !important;
+  }
   #login-container {
     width: 50vw;
   }
@@ -1064,6 +1116,7 @@ main.login .backgroundImage {
   }
   main aside {
     width: 50px;
+    position: absolute;
   }
   main aside section.teams h1 {
     display: none;
@@ -1078,22 +1131,49 @@ main.login .backgroundImage {
     display: none;
   }
 }
-@media screen and (max-width: 900px) { /*tablet*/
-  .board {
+@media screen and (max-width: 1050px) { /*tablet*/
+  body {
+    overflow: auto !important;
+  }
+  main aside.sidebar section.buttons {
+    flex-direction: row;
+    justify-content: space-evenly;
+  }
+  main aside.sidebar section.buttons i {
+    font-size: 1.5rem;
+  }
+  main aside.sidebar section.buttons div img {
+    width: 1.5rem;
+  }
+  .popUp.active .content > div {
+    width: 50vw;
+  }
+  .popUp.active .content > div input {
+    width: 100%;
+  }
+  .popUp.active .content > div .buttons {
+    margin-top: 0.5rem;
+    width: 100%;
+  }
+  .popUp.active .content > div .buttons button {
+    margin-block: 1rem;
+    width: fit-content;
+  }
+  .popUp.active .content > div .teamList {
+    width: 100%;
+  }
+  .board .sections {
     display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: fit-content;
+    overflow: auto;
   }
   .board .sections section {
-    width: 60%;
-    height: 100%;
+    width: 80%;
+    margin-bottom: 2rem;
     border-radius: 1rem;
     box-shadow: 0.1rem 0.1rem 0.1rem hsl(0, 0%, 25%);
-    overflow: hidden;
-  }
-  .board section.player, .board section.calendar {
-    display: none;
-  }
-  .board section.chat .chatBox {
-    height: 77vh;
   }
   .userSettings .buttons button {
     border: none;
@@ -1109,6 +1189,44 @@ main.login .backgroundImage {
 @media screen and (max-width: 600px) { /*phone*/
   #login-container {
     width: 90vw;
+  }
+  main aside.sidebar {
+    position: absolute;
+    z-index: 100;
+    width: 10vw;
+    min-width: 0;
+    padding: 0.5rem;
+    box-shadow: 0.5rem 0.5rem 0.5rem rgba(0, 0, 0, 0.42);
+    transition: all 0.3s;
+    height: fit-content;
+  }
+  main aside.sidebar .toggleAside {
+    display: grid;
+    place-content: center;
+    font-size: 1.2rem;
+    padding: 0.2rem;
+  }
+  main aside.sidebar .toggleAside .x {
+    display: none;
+  }
+  main aside.sidebar:not(.active) {
+    border-bottom-right-radius: 0.5rem;
+  }
+  main aside.sidebar:not(.active) .buttons, main aside.sidebar:not(.active) button, main aside.sidebar:not(.active) .content, main aside.sidebar:not(.active) hr {
+    display: none !important;
+  }
+  main aside.sidebar.active {
+    height: 94dvh;
+    width: 35vw;
+  }
+  main aside.sidebar.active .toggleAside .x {
+    display: block;
+  }
+  main aside.sidebar.active .toggleAside .burger {
+    display: none;
+  }
+  .board .sections section {
+    width: 90%;
   }
   .board section {
     width: 90%;
